@@ -67,9 +67,3 @@ Keep commits small and meaningful.
 
 yaml
 Copy code
-
----
-
-✅ This gives your teammates **step-by-step setup instructions** so they can clone, install, and run immediately.  
-
-Do you want me to also create a **short section for “Module 1 Submission Checklist”** at the bottom of the README, so you can

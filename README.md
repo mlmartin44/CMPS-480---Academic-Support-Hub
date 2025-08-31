@@ -20,3 +20,6 @@ A platform where students can:
 2. Commit & push your changes to your branch
 3. Open a Pull Request → merge into `dev`
 4. Instructor-ready releases → merge `dev` into `main`
+
+## Outcome
+1. A full functioning tool for students that executes all of the above.

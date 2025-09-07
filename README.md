@@ -23,6 +23,6 @@ npm run dev
 ```
 /docs/week2/architecture.png
 /app/server.js
-/app/package.json
+package.json
 README.md
 ```

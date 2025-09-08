@@ -4,6 +4,8 @@
 Minimal **Node.js + Express** API (mock data) to support **UC-1: Join a Study Group** so we can deploy even if DB/jails aren't ready.
 
 ## Endpoints
+
+### Use Case 1: Join a Study Group 
 - `GET /api/study-groups?course=CMPS262&tag=graphs`
 - `POST /api/study-groups/:id/join`  body: `{ "role": "member" }`
 

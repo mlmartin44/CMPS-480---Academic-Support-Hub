@@ -1,7 +1,7 @@
 
 # ASH API — Week 2 Starter
 
-Minimal **Node.js + Express** API (mock data) to support **UC-1: Join a Study Group** so we can deploy even if DB/jails aren't ready.
+Minimal **Node.js + Express** API (mock data) to support **All Use cases** so we can deploy even if DB/jails aren't ready.
 
 ## Endpoints
 

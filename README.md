@@ -20,7 +20,9 @@ npm run dev
 - Build: `npm install`
 - Start: `node server.js`
 - PORT: use default `$PORT`
-
+### Use Case 1: Join a Study Group 
+- Render deployed link: https://cmps-480-academic-support-hub.onrender.com/
+  
 ## Repo Layout
 ```
 /docs/week2/architecture.png

@@ -106,4 +106,47 @@
   button:hover {
     background: #1f54b5;
   }
-  
+
+/* =====================================================
+   APPENDED: minimal helpers + link-button styling
+   ===================================================== */
+
+/* Link styled like a button (used on home cards) */
+.btn {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.btn:hover { background: #1f54b5; }
+
+/* Extra helpers for Study Groups page */
+form { display: grid; gap: 16px; margin-top: 12px; }
+label { display: flex; flex-direction: column; font-size: 14px; font-weight: 500; }
+input, select, textarea {
+  margin-top: 6px; padding: 10px 12px; border-radius: var(--radius);
+  border: 1px solid var(--border); font-size: 14px; background: #fff;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(42,110,240,0.15);
+}
+.list { list-style: none; margin-top: 16px; padding: 0; display: grid; gap: 12px; }
+.list li {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 18px;
+}
+.list li strong { display: block; font-size: 16px; margin-bottom: 4px; color: var(--primary); }
+.status { font-size: 14px; margin-left: 12px; color: #555; }
+.status.success { color: #27ae60; }
+.status.error { color: #c0392b; }
+.mt-3 { margin-top: 16px; }
+
+/* TODO markers for teammates (non-functional notes) */
+/* TODO: Add custom styles for Q&A page */
+/* TODO: Add custom styles for Resources page */
+/* TODO: Add custom styles for Planner page */

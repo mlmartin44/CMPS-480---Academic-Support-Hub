@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Academic Support Hub — Q&A</title>
+  <link rel="stylesheet" href="qastyle.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Academic Support Hub</h1>
+    <nav class="mainnav">
+      <a href="home.html">Home Page</a>
+      <a href="study-groups.html">Study Groups</a>
+      <a href="resources.html">Resources</a>
+      <a href="qa.html">Q&amp;A</a>
+      <a href="planner.html">Planner</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2 style="margin: 16px 0 12px 0;">Q&amp;A</h2>
+
+    <!-- Ask a question -->
+    <div class="card">
+      <h3>Ask a Question</h3>
+      <div class="grid cols-2">
+        <label>Course
+          <input id="qa-course" type="text" value="CMPS 480" />
+        </label>
+        <label>Author
+          <input id="qa-author" type="text" value="Ethan" />
+        </label>
+      </div>
+      <label style="display:block;margin-top:8px;">Question
+        <input id="qa-title" type="text" placeholder="e.g., How should we structure UC-2 endpoints?" />
+      </label>
+      <label style="display:block;margin-top:8px;">Body
+        <textarea id="qa-body" rows="4" placeholder="Add details..."></textarea>
+      </label>
+      <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+        <button id="qa-post">Post</button>
+        <button id="qa-refresh" class="ghost">Refresh</button>
+        <span id="qa-status" class="muted"></span>
+      </div>
+    </div>
+
+    <!-- Questions list -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>Questions</h3>
+        <label class="muted">Filter by course:
+          <select id="qa-filter">
+            <option value="">All</option>
+            <option>CMPS 480</option>
+            <option>CMPS 361</option>
+            <option>CMPS 360</option>
+          </select>
+        </label>
+      </div>
+      <div id="qa-list"></div>
+      <p id="qa-empty" class="muted" style="display:none;">No questions yet.</p>
+    </div>
+  </main>
+
+  <script>
+    const listEl   = document.getElementById('qa-list');
+    const emptyEl  = document.getElementById('qa-empty');
+    const statusEl = document.getElementById('qa-status');
+    const filterEl = document.getElementById('qa-filter');
+
+    async function fetchQuestions() {
+      const course = filterEl.value.trim();
+      const url = course ? `/api/questions?course=${encodeURIComponent(course)}` : '/api/questions';
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`GET /api/questions failed: ${res.status}`);
+      return res.json();
+    }
+
+    function renderList(items) {
+      listEl.innerHTML = '';
+      if (!items.length) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+      emptyEl.style.display = 'none';
+      for (const q of items) {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+          <div>
+            <div><strong>${q.title}</strong></div>
+            <div class="muted" style="margin:2px 0 6px 0;">${q.course} • ${q.createdAt} • by ${q.author}</div>
+            <div>${q.body}</div>
+          </div>
+        `;
+        listEl.appendChild(row);
+      }
+    }
+
+    async function load() {
+      status('');
+      try {
+        status('Loading…');
+        const data = await fetchQuestions();
+        renderList(data);
+        status('');
+      } catch (e) {
+        console.error(e);
+        status('Failed to load questions.');
+      }
+    }
+
+    function status(msg) {
+      statusEl.textContent = msg;
+    }
+
+    async function postQuestion() {
+      const course = document.getElementById('qa-course').value.trim();
+      const author = document.getElementById('qa-author').value.trim();
+      const title  = document.getElementById('qa-title').value.trim();
+      const body   = document.getElementById('qa-body').value.trim();
+
+      if (!course || !author || !title || !body) {
+        alert('Course, author, title, and body are required.');
+        return;
+      }
+
+      try {
+        status('Posting…');
+        const res = await fetch('/api/qa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ course, title, body, author })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || `POST failed: ${res.status}`);
+        }
+        // Clear inputs (keep course/author)
+        document.getElementById('qa-title').value = '';
+        document.getElementById('qa-body').value = '';
+        await load();
+        status('Posted!');
+        setTimeout(() => status(''), 1000);
+      } catch (e) {
+        console.error(e);
+        status('Failed to post.');
+      }
+    }
+
+    document.getElementById('qa-post').addEventListener('click', postQuestion);
+    document.getElementById('qa-refresh').addEventListener('click', load);
+    filterEl.addEventListener('change', load);
+
+    load();
+  </script>
+</body>
+</html>

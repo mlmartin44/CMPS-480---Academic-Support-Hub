@@ -1,0 +1,26 @@
+[
+  {
+    "id": 3,
+    "course": "CMPS 480",
+    "title": "hi",
+    "body": "question",
+    "author": "Ethan",
+    "createdAt": "2025-09-19"
+  },
+  {
+    "id": 1,
+    "course": "CMPS 480",
+    "title": "How do we structure UC-2 endpoints?",
+    "body": "Looking for example payloads.",
+    "author": "Ethan",
+    "createdAt": "2025-09-15"
+  },
+  {
+    "id": 2,
+    "course": "CMPS 361",
+    "title": "Grid pagination bug in PHP",
+    "body": "Next/Prev overshoots page count.",
+    "author": "Ethan",
+    "createdAt": "2025-09-17"
+  }
+]

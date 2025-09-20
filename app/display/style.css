@@ -1,0 +1,109 @@
+/* Reset + base styles */
+:root {
+    --bg: #f7f8fa;
+    --text: #222;
+    --primary: #2a6ef0;
+    --card-bg: #fff;
+    --border: #e1e4e8;
+    --radius: 12px;
+    --shadow: 0 2px 6px rgba(0,0,0,0.08);
+    --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  
+  /* Top bar */
+  .topbar {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .topbar h1 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  .topbar nav a {
+    margin-right: 14px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 15px;
+  }
+  
+  .topbar nav a:hover {
+    color: var(--primary);
+  }
+  
+  /* Containers */
+  .container {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 20px;
+  }
+  
+  /* Grid + Cards */
+  .grid {
+    display: grid;
+    gap: 20px;
+  }
+  
+  .cols-2 {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .card h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .card p {
+    flex: 1;
+    margin-bottom: 16px;
+    color: #555;
+  }
+  
+  /* Buttons */
+  button {
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  button:hover {
+    background: #1f54b5;
+  }
+  

@@ -50,7 +50,69 @@
 
 ### UC-3: Upload & Tag a Resource (Teammate C)
 
-(Teammate to fill in details, flows, and API examples)
+**Preconditions**
+- Student is logged in.
+- Student has a file or note to upload.
+
+**Main Flow**
+
+1. Student navigates to Upload Resource page.
+2. Student fills in: Title, Course, Tags, and optionally a description.
+3. Student clicks **Submit**.
+4. System validates required fields (Title, Course, UploadedBy).
+5. System adds the new resource to the list.
+6. Resource appears in search results filtered by course or tag.
+
+**Edge Cases**
+- Missing required fields → display error.
+- Duplicate resource → allow or warn.
+- Invalid tag → ignore or prompt for correction.
+
+**API Support**
+- 'GET /api/resources?course=CMPS262&tag=graphs
+
+[
+  {
+    "_id": "res_001",
+    "title": "Graph Theory Notes",
+    "course": "CMPS262",
+    "tags": ["graphs", "exam prep"],
+    "uploadedBy": "student1",
+    "createdAt": "2025-09-21T22:09:03.127Z"
+  },
+  {
+    "_id": "res_002",
+    "title": "Discrete Math Notes",
+    "course": "CMPS162",
+    "tags": ["logic"],
+    "uploadedBy": "student2",
+    "createdAt": "2025-09-21T22:09:48.270Z"
+  }
+]
+
+
+POST /api/resources
+
+Request Body:
+
+{
+  "title": "Discrete Math Notes",
+  "course": "CMPS162",
+  "tags": ["logic"],
+  "uploadedBy": "student2"
+}
+
+
+Response:
+
+{
+  "_id": "res_002",
+  "title": "Discrete Math Notes",
+  "course": "CMPS162",
+  "tags": ["logic"],
+  "uploadedBy": "student2",
+  "createdAt": "2025-09-21T22:09:48.270Z"
+}
 
 ### UC-4: Assignment Planner with Calendar Sync (Brandon)
 

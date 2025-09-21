@@ -1,5 +1,6 @@
 
 import express from 'express';
+import resourceRoutes from './app/routes/resources.js';
 import helmet from 'helmet';
 import cors from 'cors';
 
@@ -9,6 +10,8 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 app.use(cors({ origin: '*' }));
 app.use(express.json());
+app.use("/api/resources", resourceRoutes);
+
 
 const groups = [
   { _id: 'sg_001', course: 'CMPS262', title: 'Algorithms Exam Prep', tags: ['graphs','sorting'], schedule: { day: 'Tue', time: '18:00', tz: 'America/New_York' }, maxSize: 8, membersCount: 5, isOpen: true },

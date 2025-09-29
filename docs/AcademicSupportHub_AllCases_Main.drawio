@@ -1,0 +1,178 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0" version="28.2.5">
+  <diagram name="Unified ERD (Labeled)" id="Unified-Labeled">
+    <mxGraphModel dx="1668" dy="889" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2600" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="id8001" value="Legend" style="swimlane;rounded=1;fillColor=#F7F7F7;strokeColor=#999999;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="670" y="990" width="500" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8002" value="" style="rounded=1;fillColor=#FFEECC;strokeColor=#666666;" parent="id8001" vertex="1">
+          <mxGeometry x="20" y="50" width="28" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="id8003" value="UC‑1: Join Study Group" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;" parent="id8001" vertex="1">
+          <mxGeometry x="60" y="48" width="400" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="id8004" value="" style="rounded=1;fillColor=#CCE5FF;strokeColor=#666666;" parent="id8001" vertex="1">
+          <mxGeometry x="20" y="80" width="28" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="id8005" value="UC‑2: Q&amp;A" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;" parent="id8001" vertex="1">
+          <mxGeometry x="60" y="78" width="400" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="id8006" value="" style="rounded=1;fillColor=#E5FFCC;strokeColor=#666666;" parent="id8001" vertex="1">
+          <mxGeometry x="20" y="110" width="28" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="id8007" value="UC‑3: Resources &amp; Tags" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;" parent="id8001" vertex="1">
+          <mxGeometry x="60" y="108" width="400" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="id8008" value="" style="rounded=1;fillColor=#F2CCFF;strokeColor=#666666;" parent="id8001" vertex="1">
+          <mxGeometry x="20" y="140" width="28" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="id8009" value="UC‑4: Planner &amp; Calendar" style="text;html=1;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;" parent="id8001" vertex="1">
+          <mxGeometry x="60" y="138" width="400" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="id8014" value="User" style="swimlane;fillColor=#FFFFFF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="120" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8015" value="&lt;div&gt;user_id (PK)&lt;/div&gt;&lt;div&gt;full_name&lt;/div&gt;&lt;div&gt;email (UNIQUE)&lt;/div&gt;&lt;div&gt;handle&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8014" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8016" value="Course" style="swimlane;fillColor=#FFFFFF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="380" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8017" value="&lt;div&gt;course_id (PK)&lt;/div&gt;&lt;div&gt;course_code&lt;/div&gt;&lt;div&gt;name&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8016" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8018" value="StudyGroup" style="swimlane;fillColor=#FFEECC;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="640" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8019" value="&lt;div&gt;group_id (PK)&lt;/div&gt;&lt;div&gt;name&lt;/div&gt;&lt;div&gt;course_id (FK)&lt;/div&gt;&lt;div&gt;owner_user_id (FK)&lt;/div&gt;&lt;div&gt;visibility&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8018" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8020" value="GroupMembership" style="swimlane;fillColor=#FFEECC;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="920" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8021" value="&lt;div&gt;membership_id (PK)&lt;/div&gt;&lt;div&gt;group_id (FK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;role&lt;/div&gt;&lt;div&gt;joined_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8020" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8022" value="JoinRequest" style="swimlane;fillColor=#FFEECC;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="1180" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8023" value="&lt;div&gt;request_id (PK)&lt;/div&gt;&lt;div&gt;group_id (FK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;status&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;&lt;div&gt;decided_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8022" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8024" value="Question" style="swimlane;fillColor=#CCE5FF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="760" y="120" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8025" value="&lt;div&gt;question_id (PK)&lt;/div&gt;&lt;div&gt;group_id (FK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;title&lt;/div&gt;&lt;div&gt;body_md&lt;/div&gt;&lt;div&gt;is_resolved&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8024" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8026" value="Answer" style="swimlane;fillColor=#CCE5FF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="760" y="440" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8027" value="&lt;div&gt;answer_id (PK)&lt;/div&gt;&lt;div&gt;question_id (FK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;body_md&lt;/div&gt;&lt;div&gt;is_accepted&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8026" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8028" value="Comment" style="swimlane;fillColor=#CCE5FF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="760" y="720" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8029" value="&lt;div&gt;comment_id (PK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;target_type&lt;/div&gt;&lt;div&gt;target_id (FK)&lt;/div&gt;&lt;div&gt;body_md&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8028" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8030" value="Resource" style="swimlane;fillColor=#E5FFCC;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="1320" y="120" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8031" value="&lt;div&gt;resource_id (PK)&lt;/div&gt;&lt;div&gt;group_id (FK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;title&lt;/div&gt;&lt;div&gt;description_md&lt;/div&gt;&lt;div&gt;url/file_path&lt;/div&gt;&lt;div&gt;file_type&lt;/div&gt;&lt;div&gt;size_bytes&lt;/div&gt;&lt;div&gt;downloads&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8030" vertex="1">
+          <mxGeometry y="20" width="130" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8032" value="Tag" style="swimlane;fillColor=#E5FFCC;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="1320" y="440" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8033" value="&lt;div&gt;tag_id (PK)&lt;/div&gt;&lt;div&gt;name (UNIQUE)&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8032" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8034" value="ResourceTag" style="swimlane;fillColor=#E5FFCC;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="1320" y="680" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8035" value="&lt;div&gt;resource_id (FK)&lt;/div&gt;&lt;div&gt;tag_id (FK)&lt;/div&gt;&lt;div&gt;PRIMARY KEY(resource_id, tag_id)&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8034" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8036" value="Assignment" style="swimlane;fillColor=#F2CCFF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="1900" y="120" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8037" value="&lt;div&gt;assignment_id (PK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;group_id (FK NULL)&lt;/div&gt;&lt;div&gt;title&lt;/div&gt;&lt;div&gt;due_at&lt;/div&gt;&lt;div&gt;status&lt;/div&gt;&lt;div&gt;priority&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8036" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8038" value="Reminder" style="swimlane;fillColor=#F2CCFF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="1900" y="420" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8039" value="&lt;div&gt;reminder_id (PK)&lt;/div&gt;&lt;div&gt;assignment_id (FK)&lt;/div&gt;&lt;div&gt;remind_at&lt;/div&gt;&lt;div&gt;method&lt;/div&gt;&lt;div&gt;sent&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8038" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8040" value="CalendarLink" style="swimlane;fillColor=#F2CCFF;rounded=1;" parent="1" vertex="1">
+          <mxGeometry x="1900" y="660" width="260" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="id8041" value="&lt;div&gt;calendar_link_id (PK)&lt;/div&gt;&lt;div&gt;assignment_id (FK UNIQUE)&lt;/div&gt;&lt;div&gt;provider&lt;/div&gt;&lt;div&gt;external_event_id&lt;/div&gt;&lt;div&gt;last_synced_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id8040" vertex="1">
+          <mxGeometry y="20" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="id8042" value="1..*  ← users create/own groups" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8018" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8043" value="1..*  (course has many groups)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8016" target="id8018" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8044" value="1..*  (user memberships)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8020" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8045" value="1..*  (group memberships)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8018" target="id8020" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8046" value="1..*  (user join requests)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8022" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8047" value="1..*  (group join requests)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8018" target="id8022" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8048" value="1..*  (group questions)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8018" target="id8024" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8049" value="1..*  (user asks many)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8024" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8050" value="1..*  (answers per question)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8024" target="id8026" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8051" value="1..*  (user answers many)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8026" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8052" value="1..*  (user comments)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8028" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8053" value="1..*  (group resources)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8018" target="id8030" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8054" value="1..*  (user uploads)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8030" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8055" value="1..*  (resource tagged)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8030" target="id8034" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8056" value="1..*  (tag on resources)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8032" target="id8034" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8057" value="1..*  (user assignments)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8014" target="id8036" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8058" value="0..*  (optional link)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8018" target="id8036" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8059" value="1..*  (reminders)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8036" target="id8038" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id8060" value="0..1  (unique link)" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id8036" target="id8040" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

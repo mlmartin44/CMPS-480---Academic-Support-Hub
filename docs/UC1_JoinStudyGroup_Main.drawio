@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0" version="28.2.5">
+  <diagram name="UC‑1 Join a Study Group" id="UC1-Labeled">
+    <mxGraphModel dx="1418" dy="756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="id12005" value="User" style="swimlane;rounded=1;fillColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="280" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="id12006" value="&lt;div&gt;user_id (PK)&lt;/div&gt;&lt;div&gt;full_name&lt;/div&gt;&lt;div&gt;email (UNIQUE)&lt;/div&gt;&lt;div&gt;handle&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id12005" vertex="1">
+          <mxGeometry y="22" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell id="id12007" value="Course" style="swimlane;rounded=1;fillColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="80" y="320" width="280" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="id12008" value="&lt;div&gt;course_id (PK)&lt;/div&gt;&lt;div&gt;course_code&lt;/div&gt;&lt;div&gt;name&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id12007" vertex="1">
+          <mxGeometry y="22" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell id="id12009" value="StudyGroup" style="swimlane;rounded=1;fillColor=#FFEECC;" parent="1" vertex="1">
+          <mxGeometry x="420" y="90" width="280" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="id12010" value="&lt;div&gt;group_id (PK)&lt;/div&gt;&lt;div&gt;name&lt;/div&gt;&lt;div&gt;course_id (FK)&lt;/div&gt;&lt;div&gt;owner_user_id (FK)&lt;/div&gt;&lt;div&gt;visibility&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id12009" vertex="1">
+          <mxGeometry y="22" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell id="id12011" value="GroupMembership" style="swimlane;rounded=1;fillColor=#FFEECC;" parent="1" vertex="1">
+          <mxGeometry x="420" y="340" width="280" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="id12012" value="&lt;div&gt;membership_id (PK)&lt;/div&gt;&lt;div&gt;group_id (FK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;role&lt;/div&gt;&lt;div&gt;joined_at&lt;/div&gt;&lt;div&gt;UNIQUE(group_id,user_id)&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id12011" vertex="1">
+          <mxGeometry y="22" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell id="id12013" value="JoinRequest" style="swimlane;rounded=1;fillColor=#FFEECC;" parent="1" vertex="1">
+          <mxGeometry x="420" y="600" width="280" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="id12014" value="&lt;div&gt;request_id (PK)&lt;/div&gt;&lt;div&gt;group_id (FK)&lt;/div&gt;&lt;div&gt;user_id (FK)&lt;/div&gt;&lt;div&gt;status&lt;/div&gt;&lt;div&gt;created_at&lt;/div&gt;&lt;div&gt;decided_at&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="id12013" vertex="1">
+          <mxGeometry y="22" width="260" height="166" as="geometry" />
+        </mxCell>
+        <mxCell id="id12015" value="1..*" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id12007" target="id12009" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id12016" value="1..*" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id12005" target="id12011" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id12017" value="1..*" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id12009" target="id12011" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id12018" value="1..*" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id12005" target="id12013" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="id12019" value="1..*" style="edgeStyle=entityRelationEdgeStyle;html=1;endArrow=ERmandOne;startArrow=ERmany;rounded=0;curved=1;fontSize=14;" parent="1" source="id12009" target="id12013" edge="1">
+          <mxGeometry width="100" height="100" relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

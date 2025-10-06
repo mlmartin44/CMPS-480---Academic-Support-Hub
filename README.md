@@ -1,69 +1,32 @@
-# CMPS-480---Academic-Support-Hub
-To use for the CMPS 480 Senior Project 
 
-# Academic Support Hub
+# ASH API — Week 2 Starter
 
-A platform where students can:
-- Find study groups by course/major
-- Access approved study materials
-- Participate in peer-to-peer Q&A
-- Use a built-in planner for assignments and deadlines
+Minimal **Node.js + Express** API (mock data) to support **All Use cases** so we can deploy even if DB/jails aren't ready.
 
----
+## Endpoints
 
-## Branches
-- `main` → stable production-ready code
-- `dev` → integration branch (merge feature branches here first)
+### Use Case 1: Join a Study Group 
+- `GET /api/study-groups?course=CMPS262&tag=graphs`
+- `POST /api/study-groups/:id/join`  body: `{ "role": "member" }`
 
-## Team Workflow
-1. Create a feature branch from `dev`
-2. Commit & push your changes to your branch
-3. Open a Pull Request → merge into `dev`
-4. Instructor-ready releases → merge `dev` into `main`
-
----
-
-## Getting Started
-
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- Git (to clone the repo)
-
-### Setup Instructions
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/YOURORG/CMPS-480---Academic-Support-Hub.git
-   cd CMPS-480---Academic-Support-Hub
-   git checkout dev
-Go into the app folder and install dependencies:
-
-bash
-Copy code
-cd app
+## Local Dev
+```bash
 npm install
-Start the development server:
+npm run dev
+# http://localhost:5000/api/study-groups?course=CMPS262
+```
 
-bash
-Copy code
-npm start
-Open in browser:
-
-Home: http://localhost:3000/
-
-Health check: http://localhost:3000/health
-
-Study groups: http://localhost:3000/study-groups
-
-Resources: http://localhost:3000/resources
-
-Planner: http://localhost:3000/planner
-
-## Notes
-Do not commit node_modules or .env files (they’re ignored in .gitignore).
-
-Always branch off dev when adding features.
-
-Keep commits small and meaningful.
-
-yaml
-Copy code
+## Deploy (Render)
+- Build: `npm install`
+- Start: `node server.js`
+- PORT: use default `$PORT`
+### Use Case 1: Join a Study Group 
+- Render deployed link: https://cmps-480-academic-support-hub.onrender.com/
+  
+## Repo Layout
+```
+/docs/week2/architecture.png
+/app/server.js
+package.json
+README.md
+```

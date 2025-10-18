@@ -26,17 +26,16 @@
       <h3>Ask a Question</h3>
       <div class="grid cols-2">
         <label>Course
-          <input id="qa-course" type="text" value="CMPS 480" />
+          <!-- now a SELECT of real CourseIDs -->
+          <select id="qa-courseId"></select>
         </label>
         <label>Author
           <input id="qa-author" type="text" value="Ethan" />
         </label>
       </div>
       <label style="display:block;margin-top:8px;">Question
-        <input id="qa-title" type="text" placeholder="e.g., How should we structure UC-2 endpoints?" />
-      </label>
-      <label style="display:block;margin-top:8px;">Body
-        <textarea id="qa-body" rows="4" placeholder="Add details..."></textarea>
+        <!-- Single content field (matches DB column 'Content') -->
+        <textarea id="qa-content" rows="4" placeholder="Type your question..."></textarea>
       </label>
       <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
         <button id="qa-post">Post</button>
@@ -50,11 +49,9 @@
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Questions</h3>
         <label class="muted">Filter by course:
-          <select id="qa-filter">
+          <!-- filter by CourseID -->
+          <select id="qa-filterId">
             <option value="">All</option>
-            <option>CMPS 480</option>
-            <option>CMPS 361</option>
-            <option>CMPS 360</option>
           </select>
         </label>
       </div>
@@ -67,14 +64,37 @@
     const listEl   = document.getElementById('qa-list');
     const emptyEl  = document.getElementById('qa-empty');
     const statusEl = document.getElementById('qa-status');
-    const filterEl = document.getElementById('qa-filter');
+    const filterIdEl = document.getElementById('qa-filterId');
+    const courseIdEl = document.getElementById('qa-courseId');
+
+    const esc = (s='') => s.toString().replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+    async function fetchJSON(url, opts) {
+      const res = await fetch(url, opts);
+      if (!res.ok) {
+        let msg = `${res.status}`;
+        try { const j = await res.json(); if (j.message) msg = j.message; } catch {}
+        throw new Error(msg);
+      }
+      return res.json();
+    }
+
+    async function loadCourses() {
+      const rows = await fetchJSON('/api/courses');
+      // fill both selectors
+      const options = ['<option value="">All</option>']
+        .concat(rows.map(c => `<option value="${c.CourseID}">${esc(c.CourseName)} (${c.CourseID})</option>`))
+        .join('');
+      filterIdEl.innerHTML = options;
+
+      const askOptions = rows.map(c => `<option value="${c.CourseID}">${esc(c.CourseName)} (${c.CourseID})</option>`).join('');
+      courseIdEl.innerHTML = askOptions;
+    }
 
     async function fetchQuestions() {
-      const course = filterEl.value.trim();
-      const url = course ? `/api/questions?course=${encodeURIComponent(course)}` : '/api/questions';
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`GET /api/questions failed: ${res.status}`);
-      return res.json();
+      const courseId = filterIdEl.value.trim();
+      const url = courseId ? `/api/questions?courseId=${encodeURIComponent(courseId)}` : '/api/questions';
+      return fetchJSON(url);
     }
 
     function renderList(items) {
@@ -89,17 +109,18 @@
         row.className = 'item-row';
         row.innerHTML = `
           <div>
-            <div><strong>${q.title}</strong></div>
-            <div class="muted" style="margin:2px 0 6px 0;">${q.course} • ${q.createdAt} • by ${q.author}</div>
-            <div>${q.body}</div>
+            <div><strong>${esc(q.author)}</strong> asked:</div>
+            <div class="muted" style="margin:2px 0 6px 0;">CourseID: ${q.courseId ?? ''} • id ${q.id}</div>
+            <div>${esc(q.content)}</div>
           </div>
         `;
         listEl.appendChild(row);
       }
     }
 
+    function status(msg) { statusEl.textContent = msg; }
+
     async function load() {
-      status('');
       try {
         status('Loading…');
         const data = await fetchQuestions();
@@ -111,35 +132,29 @@
       }
     }
 
-    function status(msg) {
-      statusEl.textContent = msg;
-    }
-
     async function postQuestion() {
-      const course = document.getElementById('qa-course').value.trim();
-      const author = document.getElementById('qa-author').value.trim();
-      const title  = document.getElementById('qa-title').value.trim();
-      const body   = document.getElementById('qa-body').value.trim();
+      const courseId = courseIdEl.value.trim();
+      const author   = document.getElementById('qa-author').value.trim();
+      const content  = document.getElementById('qa-content').value.trim();
 
-      if (!course || !author || !title || !body) {
-        alert('Course, author, title, and body are required.');
+      if (!author || !content) {
+        alert('Author and question are required.');
         return;
       }
 
       try {
         status('Posting…');
-        const res = await fetch('/api/qa', {
+        await fetchJSON('/api/questions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ course, title, body, author })
+          body: JSON.stringify({
+            courseId: courseId ? Number(courseId) : null,
+            author,
+            content
+          })
         });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.message || `POST failed: ${res.status}`);
-        }
-        // Clear inputs (keep course/author)
-        document.getElementById('qa-title').value = '';
-        document.getElementById('qa-body').value = '';
+        // Clear only the content box
+        document.getElementById('qa-content').value = '';
         await load();
         status('Posted!');
         setTimeout(() => status(''), 1000);
@@ -151,9 +166,12 @@
 
     document.getElementById('qa-post').addEventListener('click', postQuestion);
     document.getElementById('qa-refresh').addEventListener('click', load);
-    filterEl.addEventListener('change', load);
+    filterIdEl.addEventListener('change', load);
 
-    load();
+    (async () => {
+      await loadCourses();
+      await load();
+    })();
   </script>
 </body>
 </html>

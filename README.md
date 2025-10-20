@@ -1,69 +1,128 @@
-# CMPS-480---Academic-Support-Hub
-To use for the CMPS 480 Senior Project 
+Academic Support Hub — Week 3
 
-# Academic Support Hub
+📌 Overview
 
-A platform where students can:
-- Find study groups by course/major
-- Access approved study materials
-- Participate in peer-to-peer Q&A
-- Use a built-in planner for assignments and deadlines
+This project is the Academic Support Hub (ASH), a student tool that provides:
 
----
+Study Groups (join or create groups by course/major)
 
-## Branches
-- `main` → stable production-ready code
-- `dev` → integration branch (merge feature branches here first)
+Resources (upload and tag study materials)
 
-## Team Workflow
-1. Create a feature branch from `dev`
-2. Commit & push your changes to your branch
-3. Open a Pull Request → merge into `dev`
-4. Instructor-ready releases → merge `dev` into `main`
+Q&A (ask and answer peer questions)
 
----
+Planner (track assignments and deadlines)
 
-## Getting Started
+This week’s focus was creating a minimal working interface and connecting the frontend (HTML/CSS/JS) with the backend API (Express).
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- Git (to clone the repo)
 
-### Setup Instructions
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/YOURORG/CMPS-480---Academic-Support-Hub.git
-   cd CMPS-480---Academic-Support-Hub
-   git checkout dev
-Go into the app folder and install dependencies:
+🚀 Getting Started
+Prerequisites
 
-bash
-Copy code
-cd app
+Node.js
+ (v18+)
+
+npm (comes with Node.js)
+
+Clone the Repository
+git clone <repo-url>
+cd academic-support-hub
+git checkout week3
+
+⚙️ Running the Backend
+
+Install dependencies:
+
+cd backend
 npm install
-Start the development server:
 
-bash
-Copy code
-npm start
-Open in browser:
 
-Home: http://localhost:3000/
+Start the server:
 
-Health check: http://localhost:3000/health
+npm run dev
 
-Study groups: http://localhost:3000/study-groups
 
-Resources: http://localhost:3000/resources
+By default, the API runs at:
 
-Planner: http://localhost:3000/planner
+http://localhost:5000
 
-## Notes
-Do not commit node_modules or .env files (they’re ignored in .gitignore).
+Available Endpoints (so far)
 
-Always branch off dev when adding features.
+GET /api/study-groups → List study groups (filter by course or tag)
 
-Keep commits small and meaningful.
+POST /api/study-groups/:id/join → Join a study group (or waitlist if full)
 
-yaml
-Copy code
+👉 Placeholders exist for other APIs (Resources, Q&A, Planner).
+
+
+🖥️ Running the Frontend
+
+Open the frontend files:
+
+cd app
+
+
+Open home.html in your browser (right-click → “Open With Live Server” if using VS Code extension).
+
+Navigation links are available for all pages:
+
+home.html → Main entry point
+
+study-groups.html → Connected to backend API
+
+resources.html → (placeholder)
+
+qa.html → (placeholder)
+
+planner.html → (placeholder)
+
+
+📂 Project Structure
+academic-support-hub/
+├── backend/              # Express API
+│   ├── server.js         # API routes (Study Groups + placeholders)
+│   ├── package.json
+│   └── ...               
+│
+├── app/                  # Frontend (HTML, CSS, JS)
+│   ├── home.html
+│   ├── study-groups.html
+│   ├── resources.html    # placeholder
+│   ├── qa.html           # placeholder
+│   ├── planner.html      # placeholder
+│   ├── style.css
+│   ├── study-groups.js
+│   ├── api.js
+│   └── ...
+│
+└── README.md             # This file
+
+
+✅ Current Features
+
+Study Groups:
+
+Browse groups
+
+Join groups / waitlist when full
+
+Home page with navigation & Canvas-like styling
+
+
+🔜 Planned Features
+
+Resources Page (UC-3): Upload and tag study materials
+
+Q&A Page (UC-2): Post questions, accept answers, and display history
+
+Planner Page (UC-4): Add/view assignments by deadline, calendar sync
+
+
+👥 Contributors
+
+Mariah Martin — UC-1: Study Groups, repo/branch setup, slides
+
+(Teammate Name) — UC-2: Q&A
+
+(Teammate Name) — UC-3: Resources
+
+(Teammate Name) — UC-4: Planner

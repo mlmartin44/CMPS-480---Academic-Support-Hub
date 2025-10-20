@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Academic Support Hub — Study Groups</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Study Groups</h1>
+    <nav>
+      <a href="home.html">Home</a>
+      <a href="resources.html">Resources</a> <!-- TODO: teammate adds page -->
+      <a href="qa.html">Q&A</a>               <!-- TODO: teammate adds page -->
+      <a href="planner.html">Planner</a>      <!-- TODO: teammate adds page -->
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- API base config -->
+    <section class="card">
+      <h2>API Configuration - While in Dev</h2>
+      <p>Paste your backend base URL (e.g., <code>http://localhost:5000</code> or your jail/Render URL), then Save:</p>
+      <div class="grid">
+        <label>API Base URL
+          <input id="apiBaseUrl" type="url" placeholder=" use http://localhost:5000" />
+        </label>
+      </div>
+      <div class="mt-3">
+        <button id="saveBaseUrl">Save</button>
+        <span id="apiStatus" class="status"></span>
+      </div>
+    </section>
+
+    <!-- View -->
+    <section class="card">
+      <h2>View Study Groups</h2>
+      <div class="grid">
+        <label>Search by course (optional)
+          <input id="searchCourse" type="text" placeholder="e.g., CMPS262" />
+        </label>
+        <label>Filter by tag (optional)
+          <input id="searchTag" type="text" placeholder="e.g., graphs" />
+        </label>
+      </div>
+      <div class="mt-3">
+        <button id="btnLoadGroups">Load Groups</button>
+        <span id="viewStatus" class="status"></span>
+      </div>
+      <ul id="groupsList" class="list mt-3"></ul>
+    </section>
+
+    <!-- Create -->
+    <section class="card">
+      <h2>Create Study Group</h2>
+      <form id="createForm">
+        <div class="grid">
+          <label>Course <input name="course" required /></label>
+          <label>Title <input name="title" required /></label>
+          <label>When <input name="when" placeholder="2025-09-20 18:00" /></label>
+          <label>Location/Link <input name="where" placeholder="Library 201 or Zoom" /></label>
+          <label>Max Members <input name="maxSize" type="number" min="1" value="5" /></label>
+        </div>
+        <div class="mt-3">
+          <button type="submit">Create</button>
+          <span id="createStatus" class="status"></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- Join -->
+    <section class="card">
+      <h2>Join Study Group</h2>
+      <form id="joinForm">
+        <div class="grid">
+          <label>Group ID <input name="groupId" required /></label>
+          <label>Your Name <input name="name" required /></label>
+        </div>
+        <div class="mt-3">
+          <button type="submit">Join</button>
+          <span id="joinStatus" class="status"></span>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="study-groups.js"></script>
+</body>
+</html>

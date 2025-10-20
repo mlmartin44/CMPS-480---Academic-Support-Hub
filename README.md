@@ -1,4 +1,4 @@
-Academic Support Hub — Week 3
+Academic Support Hub 
 
 📌 Overview
 

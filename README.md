@@ -141,7 +141,7 @@ Mariah Martin	UC-1: Study Groups, backend API, MySQL integration
 (Teammate 1)	UC-2: Q&A
 (Teammate 2)	UC-3: Resources
 (Teammate 3)	UC-4: Planner
-
+(Teammate 4) — UC-4: Planner
 ---
 ### ☁️ Deployment Notes
 On the FreeBSD jail server:

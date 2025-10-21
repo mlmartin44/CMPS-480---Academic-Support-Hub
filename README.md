@@ -24,7 +24,6 @@ The **Academic Support Hub (ASH)** is a student collaboration platform that prov
 
 ### 🪄 Clone the Repository
 
-```bash
 git clone <repo-url>
 cd academic-support-hub
 git checkout week3
@@ -43,7 +42,7 @@ By default, the API runs at:
 
 ---
 
-###🗃️ Database Configuration
+### 🗃️ Database Configuration
 The backend connects to the MySQL database using credentials stored in .env:
 
 env
@@ -56,7 +55,7 @@ DB_PORT=3306
 
 ---
 
-###🔌 Available Endpoints
+### 🔌 Available Endpoints
 
 Method	Endpoint	Description
 GET	/api/study-groups	Fetch all study groups (optionally filter by course name)
@@ -66,7 +65,7 @@ POST	/api/study-groups/:id/join	Join a study group (placeholder for future logic
 The server now communicates directly with the MySQL database, replacing previous in-memory data.
 
 ---
-###💻 Running the Frontend
+### 💻 Running the Frontend
 
 1️⃣ Open the frontend directory
 bash
@@ -79,7 +78,7 @@ If you use VS Code, right-click the file and select:
 
 ---
 
-###🧭 Navigation Pages
+### 🧭 Navigation Pages
 
 Page	Description
 home.html	Main entry point
@@ -92,7 +91,7 @@ The frontend uses JavaScript (fetch/AJAX) to send and receive data from the API 
 
 
 ---
-###📂 Project Structure
+### 📂 Project Structure
 perl
 Copy code
 academic-support-hub/
@@ -116,7 +115,7 @@ academic-support-hub/
 └── README.md
 
 ---
-###✅ Current Features
+### ✅ Current Features
 
 🧩 Study Groups
 Fetches study group data directly from MySQL
@@ -128,7 +127,7 @@ Displays groups dynamically using AJAX (fetch) requests
 Works both locally (localhost:5000) and on the jail (/project/api)
 
 ---
-###🔜 Planned Features
+### 🔜 Planned Features
 Resources (UC-3): Upload and tag course materials
 
 Q&A (UC-2): Post and answer peer questions
@@ -136,7 +135,7 @@ Q&A (UC-2): Post and answer peer questions
 Planner (UC-4): Track assignments and deadlines with calendar view
 
 ---
-###👥 Contributors
+### 👥 Contributors
 Name	Role
 Mariah Martin	UC-1: Study Groups, backend API, MySQL integration
 (Teammate 1)	UC-2: Q&A
@@ -144,7 +143,7 @@ Mariah Martin	UC-1: Study Groups, backend API, MySQL integration
 (Teammate 3)	UC-4: Planner
 
 ---
-###☁️ Deployment Notes
+### ☁️ Deployment Notes
 On the FreeBSD jail server:
 
 The backend runs at port 5000, proxied via Nginx to /project/api
@@ -159,5 +158,5 @@ tmux new -s backend
 node server.js
 # (detach with Ctrl+b then d)
 
-##Access the site at:
-#TBD
+## Access the site at:
+TBD

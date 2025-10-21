@@ -1,9 +1,14 @@
 // app/api.js
-// Teammates: add your own client helpers in the TODO sections below.
+// Client helpers with auto base URL + StudyGroups helpers
 
 (function () {
   const KEY = 'apiBaseUrl';
+  const isLocal =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  // Auto-switch: local -> http://localhost:5000/api, jail -> /project/api
+  const DEFAULT_BASE = isLocal ? 'http://localhost:5000/api' : '/project/api';
 
+  // --- Base URL management ---
   function setApiBaseUrl(url) {
     if (!url) throw new Error('Missing URL');
     const clean = url.replace(/\/$/, '');
@@ -12,11 +17,10 @@
   }
 
   function getApiBaseUrl() {
-    const val = localStorage.getItem(KEY) || '';
-    if (!val) throw new Error('Set API base URL first.');
-    return val;
+    return localStorage.getItem(KEY) || DEFAULT_BASE;
   }
 
+  // --- Request helper ---
   async function request(path, opts = {}) {
     const base = getApiBaseUrl();
     const res = await fetch(`${base}${path}`, {
@@ -37,38 +41,52 @@
 
  
   // UC-1: Study Groups (Mariah)
- 
+  // Endpoints used:
+  //   GET  /api/study-groups?course=CMPS%20101
+  //   POST /api/study-groups { course, title }
+  //   POST /api/study-groups/:id/join { name }
+
   const StudyGroups = {
-    list: ({ course = '', tag = '' } = {}) => {
+    list: ({ course = '' } = {}) => {
       const qs = new URLSearchParams();
       if (course) qs.set('course', course);
-      if (tag) qs.set('tag', tag);
       const suffix = qs.toString() ? `?${qs.toString()}` : '';
-      return request(`/api/study-groups${suffix}`);
+      return request(`/study-groups${suffix}`);
     },
-    create: (payload) =>
-      request('/api/study-groups', { method: 'POST', body: JSON.stringify(payload) }),
-    join: (id, name) =>
-      request(`/api/study-groups/${encodeURIComponent(id)}/join`, {
+    create: (payload) => {
+      // Expect payload: { course: 'CMPS 101', title: 'Study Group 1', ... }
+      const formatted = {
+        course: payload.course,
+        title: payload.title
+        // when/where/maxSize omitted here since DB stores only name+course
+      };
+      return request('/study-groups', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formatted)
+      });
+    },
+    join: (id, name) =>
+      request(`/study-groups/${encodeURIComponent(id)}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
       })
   };
 
 
   // Placeholders for other use cases 
-  
 
-  // TODO (UC-2 Q&A): add client helpers, e.g.:
- 
+  // const QA = { ... }
+  // const Resources = { ... }
+  // const Planner = { ... }
 
-  // TODO (UC-3 Resources): add client helpers, e.g.:
-
-
-  // TODO (UC-4 Planner): add client helpers, e.g.:
-
-
-
-  // Expose only what exists now (StudyGroups). Teammates should export theirs
-  window.API = { setApiBaseUrl, getApiBaseUrl, StudyGroups /* , QA, Resources, Planner */ };
+  window.API = {
+    setApiBaseUrl,
+    getApiBaseUrl,
+    StudyGroups
+    // QA,
+    // Resources,
+    // Planner
+  };
 })();

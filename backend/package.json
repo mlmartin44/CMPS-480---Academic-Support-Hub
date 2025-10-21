@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^4.19.2",
-    "helmet": "^7.0.0"
+    "helmet": "^7.0.0",
+    "mysql2": "^3.11.3"
   }
 }

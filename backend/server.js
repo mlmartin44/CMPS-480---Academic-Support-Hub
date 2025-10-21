@@ -1,135 +1,123 @@
 // backend/server.js
-// Notes for teammates: see "TODO" blocks below for UC-2/3/4 endpoints.
+// Academic Support Hub API — DB-connected (stores CourseName text)
 
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import { pool } from './db.js';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ----- Middleware (order matters) -----
 app.use(helmet());
-app.use(cors({ origin: '*' })); 
+app.use(cors()); // open while developing; tighten later if needed
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-
-// Health / Root
-
-app.get('/', (_req, res) => res.json({ status: 'ok', service: 'ASH API Week 3' }));
-app.get('/health', (_req, res) =>
-  res.json({ status: 'ok', project: 'Academic Support Hub', ts: new Date().toISOString() })
+// ----- Health / Root -----
+app.get('/', (_req, res) =>
+  res.json({ status: 'ok', service: 'ASH API (DB Connected, CourseName text)' })
 );
+
+app.get('/health', async (_req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT NOW() AS now');
+    res.json({ status: 'ok', db: true, ts: rows[0].now });
+  } catch (err) {
+    console.error('❌ Database error:', err);
+    res.status(500).json({ status: 'error', db: false, message: err.message });
+  }
+});
 
 
 // UC-1: Study Groups (Mariah)
-// Endpoints:
-//   GET    /api/study-groups        (optional filters: course, tag)
-//   POST   /api/study-groups        (create)
-//   POST   /api/study-groups/:id/join
+// Table columns used here: GroupID (PK), GroupName (title), CourseName (text)
 
-const groups = [
-  {
-    _id: 'sg_001',
-    course: 'CMPS262',
-    title: 'Algorithms Exam Prep',
-    tags: ['graphs', 'sorting'],
-    schedule: { day: 'Tue', time: '18:00', tz: 'America/New_York' },
-    where: 'Library 201',
-    maxSize: 8,
-    membersCount: 5,
-    isOpen: true
-  },
-  {
-    _id: 'sg_002',
-    course: 'CMPS162',
-    title: 'Intro to Programming Study Hall',
-    tags: ['loops', 'arrays'],
-    schedule: { day: 'Thu', time: '19:00', tz: 'America/New_York' },
-    where: 'Zoom',
-    maxSize: 10,
-    membersCount: 10,
-    isOpen: false
+
+// GET /api/study-groups?course=CMPS%20101
+app.get('/api/study-groups', async (req, res) => {
+  const { course } = req.query;
+  try {
+    let sql = 'SELECT GroupID, GroupName, CourseName FROM StudyGroup';
+    const params = [];
+    if (course) {
+      sql += ' WHERE CourseName LIKE ?';
+      params.push(`%${course}%`);
+    }
+    const [rows] = await pool.query(sql, params);
+    res.json(rows);
+  } catch (err) {
+    console.error('❌ Error fetching study groups:', err);
+    res.status(500).json({ error: 'Failed to fetch study groups.', message: err.message });
   }
-];
-
-// GET /api/study-groups?course=&tag=
-app.get('/api/study-groups', (req, res) => {
-  const { course, tag } = req.query;
-  let results = groups;
-
-  if (course) {
-    const c = String(course).toLowerCase();
-    results = results.filter(g => (g.course || '').toLowerCase() === c);
-  }
-  if (tag) {
-    const t = String(tag).toLowerCase();
-    results = results.filter(g => (g.tags || []).map(x => String(x).toLowerCase()).includes(t));
-  }
-
-  res.json(results);
 });
 
 // POST /api/study-groups { course, title, when, where, maxSize }
-app.post('/api/study-groups', (req, res) => {
-  const { course, title, when, where, maxSize } = req.body || {};
+//store title -> GroupName and course -> CourseName (text)
+app.post('/api/study-groups', async (req, res) => {
+  const { course, title } = req.body || {};
+  console.log('DEBUG /api/study-groups body:', req.body);
+
   if (!course || !title) {
     return res.status(400).json({ error: 'Course and title are required.' });
   }
 
-  const newGroup = {
-    _id: `sg_${Date.now()}`,
-    course,
-    title,
-          // A simple string "when" or a structured schedule object can be used later.
-    schedule: typeof when === 'object' ? when : (when ? { text: String(when) } : null),
-    where: where || null,
-    maxSize: Number(maxSize) > 0 ? Number(maxSize) : 5,
-    membersCount: 0,
-    isOpen: true,
-    tags: []
-  };
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO StudyGroup (GroupName, CourseName)
+       VALUES (?, ?)`,
+      [title, course]
+    );
 
-  groups.push(newGroup);
-  res.status(201).json(newGroup);
-});
-
-// POST /api/study-groups/:id/join { name }
-app.post('/api/study-groups/:id/join', (req, res) => {
-  const { id } = req.params;
-  const group = groups.find(g => g._id === id);
-  if (!group) return res.status(404).json({ error: 'Group not found' });
-
-  if (!group.isOpen || group.membersCount >= group.maxSize) {
-    return res.status(409).json({ status: 'waitlisted', groupId: id });
+    const [rows] = await pool.query(
+      'SELECT GroupID, GroupName, CourseName FROM StudyGroup WHERE GroupID = ?',
+      [result.insertId]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    console.error('❌ Error creating study group:', err);
+    res.status(500).json({ error: 'Failed to create study group.', message: err.message });
   }
+});
 
-  group.membersCount += 1;
-  if (group.membersCount >= group.maxSize) group.isOpen = false;
+// POST /api/study-groups/:id/join  (no-op for now; schema has no MemberCount)
+// add a MemberCount column and update it here
+app.post('/api/study-groups/:id/join', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await pool.query(
+      'SELECT GroupID, GroupName, CourseName FROM StudyGroup WHERE GroupID = ?',
+      [id]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: 'Group not found' });
 
-  res.json({ status: 'joined', groupId: id });
+    // placeholder success
+    res.json({ status: 'joined', groupId: Number(id) });
+  } catch (err) {
+    console.error('❌ Error joining study group:', err);
+    res.status(500).json({ error: 'Failed to join study group.', message: err.message });
+  }
 });
 
 
+// Placeholders for Other Use Cases (team)
 
-// Placeholders for other use cases 
+// TODO (UC-2: Q&A)       
+// TODO (UC-3: Resources) 
+// TODO (UC-4: Planner)  
 
-
-// TODO (UC-2: Q&A - Post a Question & Accept an Answer)
-
-
-// TODO (UC-3: Resources - Upload & Tag a Resource)
-
-
-// TODO (UC-4: Planner - Assignment Planner with Calendar Sync)
-
-
-
-// 404 + Error handling
-
+// ----- Error handling -----
 app.use((_req, res) => res.status(404).json({ error: 'Not Found' }));
 app.use((err, _req, res, _next) => {
-  console.error(err);
+  console.error('❌ Unhandled server error:', err);
   res.status(500).json({ error: 'Server error' });
 });
 
-app.listen(PORT, () => console.log(`✅ ASH API (Week 3) running on port ${PORT}`));
+// ----- Start -----
+app.listen(PORT, () =>
+  console.log(`✅ ASH API (MySQL Connected) running on port ${PORT}`)
+);

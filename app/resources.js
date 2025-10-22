@@ -1,38 +1,47 @@
-// resources.js
+// resources.js — Week 4: simulate API interaction
 
-let BASE_URL = localStorage.getItem("apiBaseUrl") || "http://localhost:5000";
-
-// Save API base URL
-document.getElementById("saveBaseUrl").addEventListener("click", () => {
-  const url = document.getElementById("apiBaseUrl").value.trim();
-  if (url) {
-    BASE_URL = url;
-    localStorage.setItem("apiBaseUrl", url);
-    document.getElementById("apiStatus").textContent = "Saved!";
+// Hard-coded "database" of resources
+let resourcesDB = [
+  {
+    _id: "res_001",
+    title: "Graph Theory Notes",
+    course: "CMPS262",
+    tags: ["graphs", "exam prep"],
+    uploadedBy: "student1"
+  },
+  {
+    _id: "res_002",
+    title: "Discrete Math Notes",
+    course: "CMPS162",
+    tags: ["logic"],
+    uploadedBy: "student2"
   }
-});
+];
 
-// Load resources
-document.getElementById("btnLoadResources").addEventListener("click", async () => {
-  const course = document.getElementById("filterCourse").value.trim();
-  const tag = document.getElementById("filterTag").value.trim();
+// Load resources (simulated)
+document.getElementById("btnLoadResources").addEventListener("click", () => {
+  const course = document.getElementById("filterCourse").value.trim().toLowerCase();
+  const tag = document.getElementById("filterTag").value.trim().toLowerCase();
   const status = document.getElementById("viewStatus");
   const list = document.getElementById("resourceList");
-  status.textContent = "Loading...";
   list.innerHTML = "";
+  status.textContent = "Loading...";
 
-  try {
-    const params = new URLSearchParams();
-    if (course) params.append("course", course);
-    if (tag) params.append("tag", tag);
+  // Simulate async API delay
+  setTimeout(() => {
+    let results = resourcesDB;
 
-    const res = await fetch(`${BASE_URL}/api/resources?${params.toString()}`);
-    const data = await res.json();
+    if (course) {
+      results = results.filter(r => r.course.toLowerCase().includes(course));
+    }
+    if (tag) {
+      results = results.filter(r => (r.tags || []).some(t => t.toLowerCase() === tag));
+    }
 
-    if (!data.length) {
+    if (!results.length) {
       list.innerHTML = "<li>No resources found.</li>";
     } else {
-      data.forEach(r => {
+      results.forEach(r => {
         const li = document.createElement("li");
         li.innerHTML = `
           <strong>${r.title}</strong>
@@ -43,42 +52,33 @@ document.getElementById("btnLoadResources").addEventListener("click", async () =
         list.appendChild(li);
       });
     }
+
     status.textContent = "Loaded";
-  } catch (err) {
-    status.textContent = "Error loading resources";
-  }
+  }, 300); // simulate network delay
 });
 
-// Upload resource
-document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+// Upload resource (simulated)
+document.getElementById("uploadForm").addEventListener("submit", (e) => {
   e.preventDefault();
   const form = e.target;
   const status = document.getElementById("uploadStatus");
   status.textContent = "Uploading...";
 
-  const body = {
-    title: form.title.value.trim(),
-    course: form.course.value.trim(),
-    tags: form.tags.value.split(",").map(t => t.trim()).filter(Boolean),
-    uploadedBy: form.uploadedBy.value.trim(),
-  };
+  // Simulate async server response
+  setTimeout(() => {
+    const newResource = {
+      _id: `res_${(resourcesDB.length + 1).toString().padStart(3, "0")}`,
+      title: form.title.value.trim(),
+      course: form.course.value.trim(),
+      tags: form.tags.value.split(",").map(t => t.trim()).filter(Boolean),
+      uploadedBy: form.uploadedBy.value.trim()
+    };
 
-  try {
-    const res = await fetch(`${BASE_URL}/api/resources`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) throw new Error("Failed to upload");
-
-    const newResource = await res.json();
+    resourcesDB.push(newResource);
     status.textContent = "Uploaded!";
     form.reset();
 
     // Refresh list automatically
     document.getElementById("btnLoadResources").click();
-  } catch (err) {
-    status.textContent = "Upload failed";
-  }
+  }, 300);
 });

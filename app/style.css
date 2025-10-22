@@ -150,3 +150,29 @@ input:focus, select:focus, textarea:focus {
 /* TODO: Add custom styles for Q&A page */
 /* TODO: Add custom styles for Resources page */
 /* TODO: Add custom styles for Planner page */
+
+/* ====================================================
+   Student Enhancement (Week 3)
+   ==================================================== */
+
+/* Add in smooth fade-in animation for cards and buttons */
+@keyframes fadeInUp {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+.card, button, .btn {
+  animation: fadeInUp 0.4s ease-in-out;
+}
+
+/* Light hover lift effect on cards */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  transition: all 0.2s ease;
+}
+
+/* Slight gradient on page background */
+body {
+  background: linear-gradient(180deg, #f9fafc 0%, #eef1f7 100%);
+}

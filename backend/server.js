@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { pool } from './db.js';
+import resourceRoutes from './routes/resources.js';
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.use(helmet());
 app.use(cors()); // open while developing; tighten later if needed
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api/resources', resourceRoutes);
+
 
 // ----- Health / Root -----
 app.get('/', (_req, res) =>
@@ -106,8 +109,12 @@ app.post('/api/study-groups/:id/join', async (req, res) => {
 
 // Placeholders for Other Use Cases (team)
 
-// TODO (UC-2: Q&A)       
-// TODO (UC-3: Resources) 
+// TODO (UC-2: Q&A) 
+      
+// UC-3: Resources (Teammate C)
+import resourceRoutes from './app/routes/resources.js';
+app.use('/api/resources', resourceRoutes);
+
 // TODO (UC-4: Planner)  
 
 // ----- Error handling -----

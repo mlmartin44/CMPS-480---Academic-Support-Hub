@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -11,6 +9,7 @@ app.use(express.json());
 
 const DISPLAY_DIR = path.join(__dirname, "display");
 app.use(express.static(DISPLAY_DIR));
+
 app.get("/", (_req, res) => res.sendFile(path.join(DISPLAY_DIR, "home.html")));
 app.get("/home.html", (_req, res) => res.sendFile(path.join(DISPLAY_DIR, "home.html")));
 app.get("/qa.html",   (_req, res) => res.sendFile(path.join(DISPLAY_DIR, "qa.html")));
@@ -18,25 +17,28 @@ app.get("/qa.html",   (_req, res) => res.sendFile(path.join(DISPLAY_DIR, "qa.htm
 
 app.get("/api/home", (_req, res) => {
   try {
-    const data = JSON.parse(fs.readFileSync(path.join(__dirname, "homeapi.json"), "utf8"));
+    const data = JSON.parse(
+      fs.readFileSync(path.join(__dirname, "homeapi.json"), "utf8")
+    );
     res.json(data);
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
 });
 
-
+/* ---------- database (MySQL) ---------- */
 const pool = mysql.createPool({
-  host: "db.it.pointpark.edu",
-  user: "ash",
-  password: "P9fhABtRJlBvD74Z",
-  database: "ash",
-  port: 3306,
+  host: process.env.ASH_DB_HOST || "db.it.pointpark.edu",
+  user: process.env.ASH_DB_USER || "ash",
+  password: process.env.ASH_DB_PASSWORD || "P9fhABtRJlBvD74Z",
+  database: process.env.ASH_DB_NAME || "ash",
+  port: Number(process.env.ASH_DB_PORT || 3306),
   connectionLimit: 10,
   waitForConnections: true,
   namedPlaceholders: true,
   connectTimeout: 8000
 });
+
 async function query(sql, params = {}) {
   const [rows] = await pool.execute(sql, params);
   return rows;
@@ -44,7 +46,7 @@ async function query(sql, params = {}) {
 
 
 async function resolveAuthorId({ authorId, author }) {
- 
+  
   if (Number.isFinite(Number(authorId))) return Number(authorId);
 
   
@@ -59,24 +61,28 @@ async function resolveAuthorId({ authorId, author }) {
       );
       if (r.length) return r[0].UserID;
     }
-  
-    const r2 = await query(`SELECT UserID FROM User WHERE Email = :email LIMIT 1`, { email: author });
+
+    const r2 = await query(
+      `SELECT UserID FROM User WHERE Email = :email LIMIT 1`,
+      { email: author }
+    );
     if (r2.length) return r2[0].UserID;
   }
 
-  throw new Error("authorId required (PostedBy is a UserID). Provide numeric authorId or a known name/email.");
+  throw new Error(
+    "authorId required (PostedBy is a UserID). Provide numeric authorId or a known name/email."
+  );
 }
 
 async function resolveCourseIdFromString(course) {
   if (!course) return null;
- 
+
   const byName = await query(
     `SELECT CourseID FROM Course WHERE CourseName = :course LIMIT 1`,
     { course }
   );
   if (byName.length) return byName[0].CourseID;
 
- 
   if (/^\d+$/.test(String(course))) return Number(course);
 
   return null;
@@ -100,7 +106,9 @@ app.get("/api/courses", async (req, res) => {
             ORDER BY CourseName`
         );
     res.json(rows);
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
 
 
@@ -121,9 +129,10 @@ app.get("/api/study-groups", async (req, res) => {
             ORDER BY GroupName`
         );
     res.json(rows);
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
-
 
 app.get("/api/questions", async (req, res) => {
   const courseIdQ = req.query.courseId ? Number(req.query.courseId) : null;
@@ -147,7 +156,9 @@ app.get("/api/questions", async (req, res) => {
       courseId ? { courseId } : {}
     );
     res.json(rows);
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
 
 
@@ -157,15 +168,17 @@ app.post("/api/questions", async (req, res) => {
 
   try {
     const courseId =
-      Number.isFinite(Number(rawCourseId)) ? Number(rawCourseId)
-      : await resolveCourseIdFromString(course);
+      Number.isFinite(Number(rawCourseId))
+        ? Number(rawCourseId)
+        : await resolveCourseIdFromString(course);
+
     const postedBy = await resolveAuthorId({ authorId: rawAuthorId, author });
 
-    
-    const [{ maxId }] = await query(`SELECT COALESCE(MAX(QuestionID), 0) + 1 AS maxId FROM Question`);
+    const [{ maxId }] = await query(
+      `SELECT COALESCE(MAX(QuestionID), 0) + 1 AS maxId FROM Question`
+    );
     const nextId = maxId;
 
-    
     await query(
       `INSERT INTO Question (QuestionID, Content, PostedBy, CourseID)
        VALUES (:id, :content, :postedBy, :courseId)`,
@@ -199,7 +212,9 @@ app.get("/api/users", async (_req, res) => {
       `SELECT UserID AS id, FirstName, LastName, Email FROM User ORDER BY UserID ASC`
     );
     res.json(rows);
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
 });
 
 
@@ -210,8 +225,12 @@ app.get("/api/debug/db", async (_req, res) => {
     const tnames = tables.map(t => Object.values(t)[0]);
     const counts = {};
     for (const t of tnames) {
-      try { const r = await query(`SELECT COUNT(*) AS n FROM ${t}`); counts[t] = r[0].n; }
-      catch { counts[t] = "n/a"; }
+      try {
+        const r = await query(`SELECT COUNT(*) AS n FROM ${t}`);
+        counts[t] = r[0].n;
+      } catch {
+        counts[t] = "n/a";
+      }
     }
     res.json({ database: db.db, tables: tnames, counts });
   } catch (e) {
@@ -242,12 +261,18 @@ app.post("/api/seed-minimal", async (_req, res) => {
 
 
 app.get("/api/health", async (_req, res) => {
-  try { await query("SELECT 1"); res.json({ status: "ok" }); }
-  catch (e) { res.status(500).json({ status: "error", message: e.message }); }
+  try {
+    await query("SELECT 1");
+    res.json({ status: "ok" });
+  } catch (e) {
+    res.status(500).json({ status: "error", message: e.message });
+  }
 });
 
 
-const PORT = process.env.PORT || 5005;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+const PORT = Number(process.env.PORT || 5005);
+const HOST = process.env.HOST || "0.0.0.0"; 
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server running at http://${HOST}:${PORT}`);
 });

@@ -119,6 +119,6 @@ button.ghost {
 .item-row:last-child { border-bottom: 0; }
 .item-row .meta { color: var(--muted); font-size: 14px; margin: 2px 0 6px; }
 
-/* Utility */
+
 .muted { color: var(--muted); font-size: 14px; }
 .hidden { display: none !important; }

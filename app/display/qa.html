@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Academic Support Hub — Q&A</title>
-  <link rel="stylesheet" href="qastyle.css" />
+  <link rel="stylesheet" href="qastyle.css?v=3" />
 </head>
 <body>
   <header class="topbar">
@@ -19,14 +19,13 @@
   </header>
 
   <main class="container">
-    <h2 style="margin: 16px 0 12px 0;">Q&amp;A</h2>
+    <h2 style="margin:16px 0 12px;">Q&amp;A</h2>
 
-    <!-- Ask a question -->
+    
     <div class="card">
       <h3>Ask a Question</h3>
       <div class="grid cols-2">
         <label>Course
-          <!-- now a SELECT of real CourseIDs -->
           <select id="qa-courseId"></select>
         </label>
         <label>Author
@@ -34,22 +33,20 @@
         </label>
       </div>
       <label style="display:block;margin-top:8px;">Question
-        <!-- Single content field (matches DB column 'Content') -->
         <textarea id="qa-content" rows="4" placeholder="Type your question..."></textarea>
       </label>
-      <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
         <button id="qa-post">Post</button>
         <button id="qa-refresh" class="ghost">Refresh</button>
         <span id="qa-status" class="muted"></span>
       </div>
     </div>
 
-    <!-- Questions list -->
+  
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <h3>Questions</h3>
         <label class="muted">Filter by course:
-          <!-- filter by CourseID -->
           <select id="qa-filterId">
             <option value="">All</option>
           </select>
@@ -60,10 +57,17 @@
     </div>
   </main>
 
+  
+  <script src="reactions.js?v=3"></script>
   <script>
-    const listEl   = document.getElementById('qa-list');
-    const emptyEl  = document.getElementById('qa-empty');
-    const statusEl = document.getElementById('qa-status');
+   
+    console.log("Reactions present?", typeof Reactions !== "undefined");
+  </script>
+
+  <script>
+    const listEl     = document.getElementById('qa-list');
+    const emptyEl    = document.getElementById('qa-empty');
+    const statusEl   = document.getElementById('qa-status');
     const filterIdEl = document.getElementById('qa-filterId');
     const courseIdEl = document.getElementById('qa-courseId');
 
@@ -81,7 +85,6 @@
 
     async function loadCourses() {
       const rows = await fetchJSON('/api/courses');
-      // fill both selectors
       const options = ['<option value="">All</option>']
         .concat(rows.map(c => `<option value="${c.CourseID}">${esc(c.CourseName)} (${c.CourseID})</option>`))
         .join('');
@@ -104,6 +107,7 @@
         return;
       }
       emptyEl.style.display = 'none';
+
       for (const q of items) {
         const row = document.createElement('div');
         row.className = 'item-row';
@@ -113,8 +117,23 @@
             <div class="muted" style="margin:2px 0 6px 0;">CourseID: ${q.courseId ?? ''} • id ${q.id}</div>
             <div>${esc(q.content)}</div>
           </div>
+          <div class="reactions-mount"></div>
         `;
         listEl.appendChild(row);
+
+        const mount = row.querySelector('.reactions-mount');
+        if (typeof Reactions !== 'undefined' && Reactions.mount) {
+          Reactions.mount(mount, {
+            id: q.id,
+            type: 'question',
+            author: q.author,
+            text: q.content,
+            createdAt: 'just now'
+          });
+        } else {
+          
+          mount.innerHTML = '<div class="muted">Reactions not available</div>';
+        }
       }
     }
 
@@ -153,7 +172,6 @@
             content
           })
         });
-        // Clear only the content box
         document.getElementById('qa-content').value = '';
         await load();
         status('Posted!');

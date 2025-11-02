@@ -14,13 +14,12 @@
 body {
   margin: 0;
   font-family: var(--font);
-  background: --bg;
   background: var(--bg);
   color: var(--fg);
   line-height: 1.5;
 }
 
-/* Topbar + nav (matches Home) */
+
 .topbar {
   background: #fff;
   position: sticky;
@@ -48,7 +47,7 @@ body {
 }
 .mainnav a:hover { color: var(--accent); }
 
-/* Layout */
+
 .container {
   max-width: 1100px;
   margin: 24px auto;
@@ -63,7 +62,7 @@ body {
   margin-bottom: 18px;
 }
 
-/* Forms */
+
 label { display: block; font-weight: 600; margin-bottom: 6px; }
 .form-group { margin: 12px 0; }
 
@@ -85,7 +84,7 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(42,110,240,0.12);
 }
 
-/* Buttons */
+
 button {
   padding: 10px 16px;
   border-radius: 12px;
@@ -103,12 +102,12 @@ button.ghost {
 }
 .btn-row { display: flex; gap: 8px; align-items: center; }
 
-/* Grid helpers */
+
 .grid { display: grid; gap: 12px; }
 .cols-2 { grid-template-columns: 1fr 1fr; }
 @media (max-width: 720px) { .cols-2 { grid-template-columns: 1fr; } }
 
-/* Q-list rows */
+
 .item-row {
   display: flex;
   justify-content: space-between;
@@ -119,6 +118,67 @@ button.ghost {
 .item-row:last-child { border-bottom: 0; }
 .item-row .meta { color: var(--muted); font-size: 14px; margin: 2px 0 6px; }
 
-
 .muted { color: var(--muted); font-size: 14px; }
 .hidden { display: none !important; }
+
+
+
+.reactions-mount { margin-top: 10px; }
+
+.card.reaction-card {
+  padding: 12px 14px;
+  margin: 10px 0 0 0;
+  box-shadow: none;
+  border-radius: 12px;
+  border-color: var(--border);
+}
+
+.reaction-card .meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.reaction-card .content { margin: 6px 0 10px; line-height: 1.4; }
+
+.reaction-card .bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.reactions { display: flex; gap: 8px; }
+
+.reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  background: #fafafa;
+  color: var(--fg);
+  font-size: 14px;
+  transition: background .15s;
+}
+.reaction:hover { background: #f0f0ff; }
+.reaction:focus { outline: none; box-shadow: 0 0 0 3px rgba(42,110,240,0.12); }
+.reaction.active { border-color: #333; font-weight: 600; background: #eef; }
+.reaction .count { font-size: 12px; color: #444; }
+
+.reply-box { display: none; margin-top: 8px; }
+.reply-box textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px 10px;
+  border: 1px solid #e1e4e8;
+  border-radius: 10px;
+  resize: vertical;
+  font-size: 14px;
+}
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+
+.child {
+  margin-left: 18px;
+  border-left: 2px solid #f1f3f5;
+  padding-left: 12px;
+}

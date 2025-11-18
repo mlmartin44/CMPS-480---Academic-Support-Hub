@@ -1,162 +1,66 @@
-# 📚 Academic Support Hub — 10.20.2025
+# Updated Business Model — Academic Support Hub (ASH)
 
-## 📌 Overview
+## Overview
+This updated Business Model Canvas reflects the insights gathered from student interviews, including commuters, athletes, graduate students, and non-traditional students at Point Park University. These findings refine the direction and priorities for the Academic Support Hub (ASH).
 
-The **Academic Support Hub (ASH)** is a student collaboration platform that provides:
+## Customer Segments
+- Commuter students with limited time on campus
+- Student-athletes with demanding schedules
+- Non-traditional and parent students balancing coursework with work or family
+- Students who struggle in specific courses or need academic support
+- Students who want trusted, course-specific study materials
+- Students who want centralized planning, reminders, and organizational tools
 
-- **Study Groups** — create, join, and view study groups by course  
-- **Resources** — upload and tag study materials *(coming soon)*  
-- **Q&A** — ask and answer peer questions *(coming soon)*  
-- **Planner** — track assignments and deadlines *(coming soon)*  
+## Value Proposition
+- Organized, course-specific study groups (more structured than group chats)
+- Clear scheduling and reminders for study sessions
+- Secure, PPU-only Q&A forum for reliable academic help
+- Centralized academic platform combining study groups, Q&A, resources, and planner
+- Peer-verified resource sharing that students trust
+- Recognition and incentive features such as badges and upvotes
+- Accessibility for busy students who cannot stay on campus for long periods
 
-> **This week’s focus:** Connecting the frontend interface to the **MySQL database** using **Express + AJAX** for live data fetching.
+## Channels
+- ASH web platform (current prototype)
+- Canvas LMS announcements (future integration possibility)
+- Email reminders for group sessions
+- Mobile-friendly web access for commuters
 
----
+## Customer Relationships
+- Organized user experience with course-specific tabs and navigation
+- Verified university login for trust and privacy
+- Course-specific communication spaces
+- Recognition features for active contributors
+- Structured study groups with defined session purposes
 
-## 🚀 Getting Started
+## Revenue Streams
+- University funding
+- Academic grants for learning and engagement tools
+- Potential future licensing
 
-### 🧰 Prerequisites
-- [Node.js](https://nodejs.org/) (v18+)
-- npm (included with Node.js)
-- MySQL database access (credentials in `.env`)
+## Key Activities
+- Creating, organizing, and scheduling study groups
+- Supporting Q&A features
+- Managing resource uploads and sharing
+- Sending reminders and planner updates
+- Monitoring engagement and group usage
 
----
+## Key Resources
+- ASH platform (frontend and backend)
+- MySQL database
+- Authentication and verification system
+- Scheduling/reminder logic
+- Student interview findings
 
-### 🪄 Clone the Repository
+## Key Partners
+- Point Park University IT
+- Academic departments
+- Student Success Center
+- Peer tutoring programs
 
-git clone <repo-url>
-cd academic-support-hub
-git checkout week3
-⚙️ Running the Backend
-1️⃣ Install dependencies
-bash
-Copy code
-cd backend
-npm install
-2️⃣ Start the server
-bash
-Copy code
-npm run dev
-By default, the API runs at:
-👉 http://localhost:5000
-
----
-
-### 🗃️ Database Configuration
-The backend connects to the MySQL database using credentials stored in .env:
-
-env
-Copy code
-DB_HOST=db.it.pointpark.edu
-DB_USER=ash
-DB_PASS=P9fhABtRJlBvD74Z
-DB_NAME=ash
-DB_PORT=3306
-
----
-
-### 🔌 Available Endpoints
-
-Method	Endpoint	Description
-GET	/api/study-groups	Fetch all study groups (optionally filter by course name)
-POST	/api/study-groups	Create a new study group (stores course name + title)
-POST	/api/study-groups/:id/join	Join a study group (placeholder for future logic)
-
-The server now communicates directly with the MySQL database, replacing previous in-memory data.
-
----
-### 💻 Running the Frontend
-
-1️⃣ Open the frontend directory
-bash
-Copy code
-cd app
-2️⃣ Launch in browser
-Open home.html in your browser.
-If you use VS Code, right-click the file and select:
-👉 “Open with Live Server”
-
----
-
-### 🧭 Navigation Pages
-
-Page	Description
-home.html	Main entry point
-study-groups.html	Fully connected to backend via AJAX
-resources.html	Placeholder for future use
-qa.html	Placeholder for Q&A feature
-planner.html	Placeholder for assignment planner
-
-The frontend uses JavaScript (fetch/AJAX) to send and receive data from the API endpoints dynamically.
-
-
----
-### 📂 Project Structure
-perl
-Copy code
-academic-support-hub/
-├── backend/              # Express + MySQL API
-│   ├── db.js             # Database connection pool
-│   ├── server.js         # API routes (Study Groups + placeholders)
-│   ├── package.json
-│   └── .env
-│
-├── app/                  # Frontend (HTML, CSS, JS)
-│   ├── home.html
-│   ├── study-groups.html
-│   ├── resources.html    # placeholder
-│   ├── qa.html           # placeholder
-│   ├── planner.html      # placeholder
-│   ├── style.css
-│   ├── api.js
-│   ├── study-groups.js
-│   └── ...
-│
-└── README.md
-
----
-### ✅ Current Features
-
-🧩 Study Groups
-Fetches study group data directly from MySQL
-
-Allows users to create new groups (course name + title)
-
-Displays groups dynamically using AJAX (fetch) requests
-
-Works both locally (localhost:5000) and on the jail (/project/api)
-
----
-### 🔜 Planned Features
-Resources (UC-3): Upload and tag course materials
-
-Q&A (UC-2): Post and answer peer questions
-
-Planner (UC-4): Track assignments and deadlines with calendar view
-
----
-### 👥 Contributors
-Name	Role
-Mariah Martin	UC-1: Study Groups, backend API, MySQL integration
-(Teammate 1)	UC-2: Q&A
-(Teammate 2)	UC-3: Resources
-(Teammate 3)	UC-4: Planner
-(Teammate 4) — UC-4: Planner
----
-### ☁️ Deployment Notes
-On the FreeBSD jail server:
-
-The backend runs at port 5000, proxied via Nginx to /project/api
-
-Frontend pages are served from /project/
-
-Use tmux to keep the Node.js process running after logout:
-
-bash
-Copy code
-tmux new -s backend
-node server.js
-# (detach with Ctrl+b then d)
-
-## Access the site at:
-TBD
+## Cost Structure
+- Server and hosting resources
+- Database storage and maintenance
+- Frontend and backend development
+- UI/UX updates and testing
+- Support and feature expansion

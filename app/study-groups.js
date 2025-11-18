@@ -7,7 +7,7 @@
 
   const btnLoadGroups = document.getElementById('btnLoadGroups');
   const searchCourse  = document.getElementById('searchCourse');
-  const searchTag     = document.getElementById('searchTag');
+  const searchTag     = document.getElementById('searchTag'); // not used yet, but kept
   const groupsList    = document.getElementById('groupsList');
   const viewStatus    = document.getElementById('viewStatus');
 
@@ -17,8 +17,18 @@
   const joinForm      = document.getElementById('joinForm');
   const joinStatus    = document.getElementById('joinStatus');
 
+  const esc = (s = '') =>
+    s.toString().replace(/[&<>"]/g, c => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;'
+    }[c]));
+
   // Hydrate API field if previously saved
-  try { apiBaseUrlInput.value = API.getApiBaseUrl(); } catch (_) {}
+  try {
+    apiBaseUrlInput.value = API.getApiBaseUrl();
+  } catch (_) {}
 
   // Save base URL
   saveBaseUrlBtn?.addEventListener('click', () => {
@@ -33,38 +43,54 @@
     }
   });
 
+  // Render list of groups (MySQL fields: GroupID, GroupName, CourseName)
+  function renderGroups(data) {
+    groupsList.innerHTML = '';
+
+    if (!Array.isArray(data) || data.length === 0) {
+      viewStatus.textContent = 'No groups found.';
+      viewStatus.className = 'status';
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    data.forEach(g => {
+      const li = document.createElement('li');
+      li.className = 'list-item';
+
+      // Backend returns: GroupID, GroupName, CourseName
+      const id    = g.GroupID ?? g.id ?? 'unknown';
+      const title = g.GroupName ?? '(No title)';
+      const course = g.CourseName ?? '(No course)';
+
+      li.innerHTML = `
+        <strong>${esc(course)} — ${esc(title)}</strong>
+        <div>ID: <code>${esc(id)}</code></div>
+      `;
+
+      frag.appendChild(li);
+    });
+
+    groupsList.appendChild(frag);
+    viewStatus.textContent = '';
+  }
+
   // Load groups
   btnLoadGroups?.addEventListener('click', async () => {
     viewStatus.textContent = 'Loading...';
     viewStatus.className = 'status';
     groupsList.innerHTML = '';
+
     try {
-      const data = await API.StudyGroups.list({
-        course: (searchCourse.value || '').trim(),
-        tag: (searchTag.value || '').trim()
-      });
-      if (!Array.isArray(data) || data.length === 0) {
-        viewStatus.textContent = 'No groups found.';
-        return;
-      }
-      const frag = document.createDocumentFragment();
-      data.forEach(g => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <strong>${g.course || 'Course ?'} — ${g.title || ''}</strong>
-          <div>ID: <code>${g._id || g.id || 'unknown'}</code></div>
-          <div>When: ${
-            g.schedule?.text ||
-            (g.schedule ? `${g.schedule.day ?? ''} ${g.schedule.time ?? ''} ${g.schedule.tz ?? ''}`.trim() : 'tbd')
-          } | Where: ${g.where || 'tbd'}</div>
-          <div>Members: ${g.membersCount ?? 0}${g.maxSize ? ' / ' + g.maxSize : ''} | Open: ${g.isOpen ? 'Yes' : 'No'}</div>
-        `;
-        frag.appendChild(li);
-      });
-      groupsList.appendChild(frag);
-      viewStatus.textContent = '';
+      const course = (searchCourse.value || '').trim();
+      // tag is currently unused by the backend, but we keep the input for future use
+      // const tag = (searchTag.value || '').trim();
+
+      const data = await API.StudyGroups.list({ course });
+      renderGroups(data);
     } catch (e) {
-      viewStatus.textContent = e.message;
+      console.error(e);
+      viewStatus.textContent = e.message || 'Failed to load groups.';
       viewStatus.className = 'status error';
     }
   });
@@ -74,21 +100,26 @@
     ev.preventDefault();
     createStatus.textContent = 'Creating...';
     createStatus.className = 'status';
+
     const form = new FormData(createForm);
     const payload = {
       course: form.get('course'),
       title:  form.get('title'),
+      // These are collected in the UI but not stored in the current DB schema
       when:   form.get('when'),
       where:  form.get('where'),
       maxSize: Number(form.get('maxSize') || 0) || undefined
     };
+
     try {
       const data = await API.StudyGroups.create(payload);
-      createStatus.textContent = 'Created! ID: ' + (data._id || data.id || 'unknown');
+      const id   = data.GroupID ?? data.id ?? 'unknown';
+      createStatus.textContent = 'Created! ID: ' + id;
       createStatus.className = 'status success';
       createForm.reset();
     } catch (e) {
-      createStatus.textContent = e.message;
+      console.error(e);
+      createStatus.textContent = e.message || 'Failed to create group.';
       createStatus.className = 'status error';
     }
   });
@@ -98,16 +129,19 @@
     ev.preventDefault();
     joinStatus.textContent = 'Joining...';
     joinStatus.className = 'status';
+
     const form = new FormData(joinForm);
     const gid  = form.get('groupId');
     const name = form.get('name');
+
     try {
       await API.StudyGroups.join(gid, name);
       joinStatus.textContent = 'Joined successfully!';
       joinStatus.className = 'status success';
       joinForm.reset();
     } catch (e) {
-      joinStatus.textContent = e.message;
+      console.error(e);
+      joinStatus.textContent = e.message || 'Failed to join group.';
       joinStatus.className = 'status error';
     }
   });

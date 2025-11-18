@@ -4,52 +4,118 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Academic Support Hub — Home</title>
-  <!-- Connect CSS -->
+
+  <!-- Global styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Header / Navbar -->
+  <!-- Top Bar / Global Nav -->
   <header class="topbar">
-    <h1>Academic Support Hub</h1>
-    <nav>
+    <div class="brand">
+      <h1 id="welcome">Academic Support Hub (ASH)</h1>
+      <p class="tagline">Find a group. Ask a question. Stay on track.</p>
+    </div>
+
+    <nav class="main-nav">
+      <a href="home.html" class="active">Home</a>
       <a href="study-groups.html">Study Groups</a>
-      <a href="resources.html">Resources</a> <!-- TODO: teammate page -->
-      <a href="qa.html">Q&A</a>               <!-- TODO: teammate page -->
-      <a href="planner.html">Planner</a>      <!-- TODO: teammate page -->
+      <a href="resources.html">Resources</a>
+      <a href="qa.html">Q&amp;A</a>
+      <a href="planner.html">Planner</a>
     </nav>
   </header>
 
-  <!-- Main Content -->
   <main class="container">
-    <div class="grid cols-2">
-      <!-- Card 1 -->
+    <!-- Hero / Overview row -->
+    <section class="grid cols-2 hero">
       <div class="card">
-        <h2>Study Groups</h2>
-        <p>Find or create a study group by course/major.</p>
-        <a class="btn" href="study-groups.html">Open</a>
+        <h2>Welcome to the Academic Support Hub</h2>
+        <p>
+          ASH brings together <strong>study groups</strong>, <strong>Q&amp;A</strong>,
+          <strong>resources</strong>, and a <strong>planner</strong> so students can
+          stay organized and get help faster.
+        </p>
+        <p class="muted">
+          Use the quick links below or the navigation bar to jump into a feature.
+        </p>
+        <div class="links">
+          <a class="btn" href="study-groups.html">Find a Study Group</a>
+          <a class="btn" href="qa.html">Ask a Question</a>
+        </div>
       </div>
 
-      <!-- Card 2 -->
+      <!-- Announcements (from /api/home) -->
+      <section class="card">
+        <h2>Announcements</h2>
+        <ul id="announcements" class="list"></ul>
+        <p id="announcements-empty" class="muted" style="display:none;">
+          No announcements.
+        </p>
+      </section>
+    </section>
+
+    <!-- Highlights + Quick Links row -->
+    <section class="grid cols-2">
       <div class="card">
-        <h2>Resources</h2>
-        <p>Store and share approved study materials.</p>
-        <a class="btn" href="resources.html">Open</a>
+        <h2>Highlights</h2>
+        <ul class="stats">
+          <li>Questions: <strong id="qCount">0</strong></li>
+          <li>Resources: <strong id="rCount">0</strong></li>
+          <li>Tasks: <strong id="tCount">0</strong></li>
+        </ul>
       </div>
 
-      <!-- Card 3 -->
       <div class="card">
-        <h2>Q&amp;A</h2>
-        <p>Ask questions and provide answers (local demo only).</p>
-        <a class="btn" href="qa.html">Open</a>
+        <h2>Quick Links</h2>
+        <div class="links">
+          <a class="btn" href="study-groups.html">Study Groups</a>
+          <a class="btn" href="resources.html">Resources</a>
+          <a class="btn" href="qa.html">Q&amp;A</a>
+          <a class="btn" href="planner.html">Planner</a>
+        </div>
       </div>
-
-      <!-- Card 4 -->
-      <div class="card">
-        <h2>Planner</h2>
-        <p>Track assignments and deadlines.</p>
-        <a class="btn" href="planner.html">Open</a>
-      </div>
-    </div>
+    </section>
   </main>
+
+  <!-- Shared API helper -->
+  <script src="api.js"></script>
+
+  <script>
+    async function loadHome() {
+      try {
+        // ✅ uses API.Home.get() which calls /api/home
+        const data = await API.Home.get();
+
+        // Welcome message (optional override from homeapi.js)
+        if (data.welcome) {
+          document.getElementById("welcome").textContent = data.welcome;
+        }
+
+        // Announcements
+        const ul = document.getElementById("announcements");
+        ul.innerHTML = "";
+        (data.announcements || []).forEach(a => {
+          const li = document.createElement("li");
+          li.textContent = a.msg;
+          ul.appendChild(li);
+        });
+        document.getElementById("announcements-empty").style.display =
+          (data.announcements && data.announcements.length) ? "none" : "block";
+
+        // Highlights
+        const h = data.highlights || {};
+        document.getElementById("qCount").textContent = h.questions ?? 0;
+        document.getElementById("rCount").textContent = h.resources ?? 0;
+        document.getElementById("tCount").textContent = h.tasks ?? 0;
+      } catch (err) {
+        console.error("Failed to load home data:", err);
+        const empty = document.getElementById("announcements-empty");
+        empty.textContent = "Could not load announcements.";
+        empty.style.display = "block";
+      }
+    }
+
+    loadHome();
+  </script>
 </body>
 </html>

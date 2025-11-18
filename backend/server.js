@@ -1,16 +1,34 @@
 // backend/server.js
-// Academic Support Hub API — DB-connected (stores CourseName text)
+// Academic Support Hub API — MySQL + static JSON for Home & Q&A
 
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { pool } from './db.js';
+import homeData from './homeapi.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// ----- Load Q&A data from qaapi.json -----
+const qaFile = path.join(__dirname, 'qaapi.json');
+let qaData = [];
+try {
+  const raw = fs.readFileSync(qaFile, 'utf8');
+  qaData = JSON.parse(raw);
+} catch (err) {
+  console.error('❌ Failed to load qaapi.json:', err);
+  qaData = [];
+}
 
 // ----- Middleware (order matters) -----
 app.use(helmet());
@@ -33,10 +51,14 @@ app.get('/health', async (_req, res) => {
   }
 });
 
+// ----- Home Dashboard API (/api/home) -----
+// Used by home.html via API.Home.get()
+app.get('/api/home', (_req, res) => {
+  res.json(homeData);
+});
 
-// UC-1: Study Groups (Mariah)
-// Table columns used here: GroupID (PK), GroupName (title), CourseName (text)
-
+// ----- UC-1: Study Groups (Mariah) -----
+// Table columns: GroupID (PK), GroupName (title), CourseName (text)
 
 // GET /api/study-groups?course=CMPS%20101
 app.get('/api/study-groups', async (req, res) => {
@@ -56,8 +78,8 @@ app.get('/api/study-groups', async (req, res) => {
   }
 });
 
-// POST /api/study-groups { course, title, when, where, maxSize }
-//store title -> GroupName and course -> CourseName (text)
+// POST /api/study-groups { course, title }
+// store title -> GroupName and course -> CourseName (text)
 app.post('/api/study-groups', async (req, res) => {
   const { course, title } = req.body || {};
   console.log('DEBUG /api/study-groups body:', req.body);
@@ -85,7 +107,6 @@ app.post('/api/study-groups', async (req, res) => {
 });
 
 // POST /api/study-groups/:id/join  (no-op for now; schema has no MemberCount)
-// add a MemberCount column and update it here
 app.post('/api/study-groups/:id/join', async (req, res) => {
   const { id } = req.params;
   try {
@@ -103,12 +124,90 @@ app.post('/api/study-groups/:id/join', async (req, res) => {
   }
 });
 
+// ----- UC-2: Q&A (Ethan) -----
+// Courses + Questions APIs used by qa.html
 
-// Placeholders for Other Use Cases (team)
+// GET /api/courses
+// For now, build courses from distinct CourseName values in StudyGroup
+app.get('/api/courses', async (_req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT DISTINCT CourseName FROM StudyGroup');
+    const courses = rows.map((r, idx) => {
+      const name = r.CourseName;
+      const match = String(name).match(/\d+/); // grab digits like 480, 361
+      const id = match ? Number(match[0]) : idx + 1;
+      return { CourseID: id, CourseName: name };
+    });
+    res.json(courses);
+  } catch (err) {
+    console.error('❌ Error fetching courses:', err);
+    res.status(500).json({ message: 'Failed to fetch courses.' });
+  }
+});
 
-// TODO (UC-2: Q&A)       
-// TODO (UC-3: Resources) 
-// TODO (UC-4: Planner)  
+// GET /api/questions[?courseId=480]
+app.get('/api/questions', (req, res) => {
+  const { courseId } = req.query;
+
+  let items = qaData.map((q) => {
+    // try to normalize courseId
+    let cid = null;
+    if (q.courseId != null) {
+      cid = Number(q.courseId);
+    } else if (q.course) {
+      const m = String(q.course).match(/\d+/);
+      cid = m ? Number(m[0]) : null;
+    }
+
+    return {
+      id: q.id,
+      courseId: cid,
+      author: q.author,
+      content: q.body ?? q.content ?? '',
+      createdAt: q.createdAt
+    };
+  });
+
+  if (courseId) {
+    items = items.filter((q) => q.courseId === Number(courseId));
+  }
+
+  res.json(items);
+});
+
+// POST /api/questions { courseId, author, content }
+app.post('/api/questions', (req, res) => {
+  const { courseId, author, content } = req.body || {};
+
+  if (!author || !content) {
+    return res.status(400).json({ message: 'Author and content required.' });
+  }
+
+  const newId = qaData.length ? Math.max(...qaData.map((q) => q.id)) + 1 : 1;
+
+  const newItem = {
+    id: newId,
+    course: courseId ? `CMPS ${courseId}` : null,
+    title: '',
+    body: content,
+    author,
+    createdAt: new Date().toISOString().split('T')[0]
+  };
+
+  qaData.push(newItem);
+
+  try {
+    fs.writeFileSync(qaFile, JSON.stringify(qaData, null, 2));
+  } catch (err) {
+    console.error('❌ Failed to persist qaapi.json:', err);
+  }
+
+  res.status(201).json({ success: true, id: newId });
+});
+
+// ----- Placeholders for Other Use Cases -----
+// TODO (UC-3: Resources)
+// TODO (UC-4: Planner)
 
 // ----- Error handling -----
 app.use((_req, res) => res.status(404).json({ error: 'Not Found' }));

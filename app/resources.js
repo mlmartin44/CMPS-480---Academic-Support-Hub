@@ -6,7 +6,6 @@
   const searchText        = document.getElementById('searchText');
   const resourcesList     = document.getElementById('resourcesList');
   const viewStatus        = document.getElementById('viewStatus');
-
   const uploadForm        = document.getElementById('uploadForm');
   const uploadStatus      = document.getElementById('uploadStatus');
 

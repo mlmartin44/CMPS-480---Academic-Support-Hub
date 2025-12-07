@@ -110,6 +110,56 @@ app.post('/api/study-groups/:id/join', async (req, res) => {
 // TODO (UC-3: Resources) 
 // TODO (UC-4: Planner)  
 
+// ----- Business Analytics Endpoints -----
+
+// 1. Total number of study groups
+app.get('/analytics/groups/count', async (_req, res) => {
+  try {
+    const [rows] = await pool.query(`SELECT COUNT(*) AS totalGroups FROM StudyGroup`);
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("❌ Analytics error:", err);
+    res.status(500).json({ error: "Failed to fetch group count" });
+  }
+});
+
+// 2. Posts per study group (requires GroupPost table)
+app.get('/analytics/groups/posts', async (_req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT groupId, COUNT(*) AS postCount
+      FROM GroupPost
+      GROUP BY groupId
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Analytics error:", err);
+    res.status(500).json({ error: "Failed to fetch post data" });
+  }
+});
+
+// 3. Active vs inactive users (active = posted at least once)
+app.get('/analytics/users/activity', async (_req, res) => {
+  try {
+    const [[totalUsers]] = await pool.query(`SELECT COUNT(*) AS total FROM User`);
+    const [[activeUsers]] = await pool.query(`
+      SELECT COUNT(DISTINCT userId) AS active
+      FROM GroupPost
+    `);
+
+    res.json({
+      totalUsers: totalUsers.total,
+      activeUsers: activeUsers.active,
+      inactiveUsers: totalUsers.total - activeUsers.active,
+      activePercent: ((activeUsers.active / totalUsers.total) * 100).toFixed(1)
+    });
+  } catch (err) {
+    console.error("❌ Analytics error:", err);
+    res.status(500).json({ error: "Failed to calculate user activity" });
+  }
+});
+
+
 // ----- Error handling -----
 app.use((_req, res) => res.status(404).json({ error: 'Not Found' }));
 app.use((err, _req, res, _next) => {

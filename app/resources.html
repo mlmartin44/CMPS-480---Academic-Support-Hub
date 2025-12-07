@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Academic Support Hub — Resources</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Study Resources</h1>
+    <nav class="main-nav">
+      <a href="home.html">Home</a>
+      <a href="study-groups.html">Study Groups</a>
+      <a href="resources.html" class="active">Resources</a>
+      <a href="qa.html">Q&amp;A</a>
+      <a href="planner.html">Planner</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Discussion-style resource board -->
+    <section class="card">
+      <h2>Posted Resources</h2>
+      <p class="muted">
+        Browse articles, books, study tools, videos, and trainings shared by Point Park students.
+        Filter by course and search by keyword.
+      </p>
+
+      <div class="grid">
+        <label>Filter by course
+          <select id="filterCourseSelect">
+            <option value="">All courses</option>
+          </select>
+        </label>
+
+        <label>Search by title, tags, or type
+          <input id="searchText" type="text" placeholder="e.g., video, exam review, book" />
+        </label>
+      </div>
+
+      <div class="mt-3">
+        <button id="btnLoadResources">Load / Refresh</button>
+        <span id="viewStatus" class="status"></span>
+      </div>
+
+      <ul id="resourcesList" class="list mt-3"></ul>
+    </section>
+
+    <!-- Post a new resource -->
+    <section class="card">
+      <h2>Share a New Resource</h2>
+      <p class="muted">
+        Post a helpful link for your classmates. Examples: YouTube explainer videos, OpenStax chapters,
+        Quizlet decks, PDF notes, or training modules.
+      </p>
+      <form id="uploadForm">
+        <div class="grid">
+          <label>Course (exact name from syllabus)
+            <input name="course" required placeholder="e.g., CMPS 480 Senior Project" />
+          </label>
+
+          <label>Title
+            <input name="title" required placeholder="Short name for the resource" />
+          </label>
+
+          <label>Resource Link / File URL
+            <input name="fileUrl" required placeholder="https://..., /files/notes.pdf" />
+          </label>
+
+          <label>Tags (include type: article, book, video, tool, training)
+            <input name="tags" placeholder="video, exam review, flashcards" />
+          </label>
+
+          <label>Your Name
+            <input name="uploaderName" required placeholder="e.g., Mariah Martin" />
+          </label>
+        </div>
+
+        <div class="mt-3">
+          <button type="submit">Post Resource</button>
+          <span id="uploadStatus" class="status"></span>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="resources.js"></script>
+</body>
+</html>

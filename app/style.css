@@ -1,75 +1,89 @@
-/* Reset + base styles */
+/* 
+   POINT PARK  THEME
+   */
 :root {
-    --bg: #f7f8fa;
-    --text: #222;
-    --primary: #2a6ef0;
-    --card-bg: #fff;
-    --border: #e1e4e8;
+    --bg: #f7f8fa;                  /* light background */
+    --text: #222;                   /* main text */
+    --primary: #006633;             /* PPU green */
+    --primary-dark: #004d26;        /* darker green hover */
+    --accent: #FFCC33;              /* PPU yellow */
+    --card-bg: #ffffff;             /* white cards */
+    --border: #e1e4e8;              /* soft gray */
     --radius: 12px;
     --shadow: 0 2px 6px rgba(0,0,0,0.08);
     --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  }
-  
-  * {
+}
+
+/* Reset */
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-  }
-  
-  body {
+}
+
+body {
     font-family: var(--font);
     background: var(--bg);
     color: var(--text);
     line-height: 1.5;
-  }
-  
-  /* Top bar */
-  .topbar {
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
+}
+
+/* 
+   TOP BAR / NAVBAR
+    */
+.topbar {
+    background: var(--primary);
+    color: white;
+    padding: 14px 20px;
     position: sticky;
     top: 0;
     z-index: 10;
     display: flex;
     flex-direction: column;
     gap: 6px;
-  }
-  
-  .topbar h1 {
-    font-size: 20px;
-    font-weight: 600;
-  }
-  
-  .topbar nav a {
+}
+
+.topbar h1 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.topbar nav a {
     margin-right: 14px;
     text-decoration: none;
-    color: var(--text);
+    color: white;
     font-size: 15px;
-  }
-  
-  .topbar nav a:hover {
-    color: var(--primary);
-  }
-  
-  /* Containers */
-  .container {
+    opacity: 0.9;
+}
+
+.topbar nav a:hover,
+.topbar nav a.active {
+    color: var(--accent); /* bold yellow */
+    opacity: 1;
+}
+
+/* 
+   LAYOUT
+   */
+.container {
     max-width: 1100px;
     margin: 32px auto;
     padding: 0 20px;
-  }
-  
-  /* Grid + Cards */
-  .grid {
+}
+
+.grid {
     display: grid;
     gap: 20px;
-  }
-  
-  .cols-2 {
+}
+
+.cols-2 {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
-  
-  .card {
+}
+
+/* 
+   CARDS
+    */
+.card {
     background: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -77,22 +91,25 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .card h2 {
+}
+
+.card h2 {
     font-size: 18px;
-    margin-bottom: 8px;
-  }
-  
-  .card p {
-    flex: 1;
-    margin-bottom: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--primary);
+}
+
+.card p {
     color: #555;
-  }
-  
-  /* Buttons */
-  button {
+    margin-bottom: 12px;
+}
+
+/* 
+   BUTTONS
+    */
+button,
+.btn {
     padding: 10px 16px;
     border-radius: var(--radius);
     border: none;
@@ -100,53 +117,125 @@
     color: #fff;
     font-size: 14px;
     cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  button:hover {
-    background: #1f54b5;
-  }
-
-/* =====================================================
-   APPENDED: minimal helpers + link-button styling
-   ===================================================== */
-
-/* Link styled like a button (used on home cards) */
-.btn {
-  display: inline-block;
-  padding: 10px 16px;
-  border-radius: var(--radius);
-  background: var(--primary);
-  color: #fff;
-  font-size: 14px;
-  text-decoration: none;
-  transition: background 0.2s ease;
+    transition: background 0.2s ease, transform 0.15s ease;
 }
-.btn:hover { background: #1f54b5; }
 
-/* Extra helpers for Study Groups page */
-form { display: grid; gap: 16px; margin-top: 12px; }
-label { display: flex; flex-direction: column; font-size: 14px; font-weight: 500; }
+button:hover,
+.btn:hover {
+    background: var(--primary-dark);
+}
+
+button:active,
+.btn:active {
+    transform: scale(0.97);
+}
+
+/* Accent button style (optional) */
+.btn-accent {
+    background: var(--accent);
+    color: #000;
+}
+.btn-accent:hover {
+    background: #e6b832;
+}
+
+/* 
+   FORMS
+    */
+form {
+    display: grid;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 input, select, textarea {
-  margin-top: 6px; padding: 10px 12px; border-radius: var(--radius);
-  border: 1px solid var(--border); font-size: 14px; background: #fff;
+    margin-top: 6px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    background: #fff;
 }
+
 input:focus, select:focus, textarea:focus {
-  outline: none; border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(42,110,240,0.15);
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(0,102,51,0.15);
 }
-.list { list-style: none; margin-top: 16px; padding: 0; display: grid; gap: 12px; }
+
+/* 
+   LISTS (Study Groups + Resources)
+   */
+.list {
+    list-style: none;
+    margin-top: 16px;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+}
+
 .list li {
-  background: var(--card-bg); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
 }
-.list li strong { display: block; font-size: 16px; margin-bottom: 4px; color: var(--primary); }
-.status { font-size: 14px; margin-left: 12px; color: #555; }
-.status.success { color: #27ae60; }
-.status.error { color: #c0392b; }
+
+.list li strong {
+    font-size: 16px;
+    color: var(--primary);
+}
+
+/* Tags (Resources page) */
+.resource-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.tag-pill {
+    padding: 4px 10px;
+    background: var(--accent);
+    color: #000;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Meta text */
+.resource-meta {
+    font-size: 13px;
+    color: #444;
+    margin-top: 4px;
+}
+
+.resource-link a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* 
+   STATUS MESSAGES
+    */
+.status {
+    font-size: 14px;
+    margin-left: 12px;
+    color: #444;
+}
+
+.status.success { color: #0f8f3b; }  /* green */
+.status.error   { color: #cc0000; } /* red */
+
+/* Spacing helpers */
 .mt-3 { margin-top: 16px; }
 
-/* TODO markers for teammates (non-functional notes) */
-/* TODO: Add custom styles for Q&A page */
-/* TODO: Add custom styles for Resources page */
-/* TODO: Add custom styles for Planner page */

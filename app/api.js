@@ -1,26 +1,17 @@
 // app/api.js
-// Client helpers with auto base URL + StudyGroups + Home helpers
+// Client helpers with auto base URL + StudyGroups + Home + Resources
 
 (function () {
-  const KEY = 'apiBaseUrl';
   const isLocal =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  // Auto-switch
+
+  // Local dev → Node on 5000, Jail → /project/api (nginx proxy)
   const DEFAULT_BASE = isLocal ? 'http://localhost:5000/api' : '/project/api';
 
-  // --- Base URL management ---
-  function setApiBaseUrl(url) {
-    if (!url) throw new Error('Missing URL');
-    const clean = url.replace(/\/$/, '');
-    localStorage.setItem(KEY, clean);
-    return clean;
-  }
-
   function getApiBaseUrl() {
-    return localStorage.getItem(KEY) || DEFAULT_BASE;
+    return DEFAULT_BASE;
   }
 
-  // --- Request helper ---
   async function request(path, opts = {}) {
     const base = getApiBaseUrl();
     const res = await fetch(`${base}${path}`, {
@@ -41,17 +32,9 @@
     return ct.includes('application/json') ? res.json() : res.text();
   }
 
-  // Home dashboard data (/api/home)
   const Home = {
-    // DEFAULT_BASE already ends with /api, so this hits /api/home
     get: () => request('/home')
   };
-
-  // UC-1: Study Groups (Mariah)
-  // Endpoints used:
-  //   GET  /api/study-groups?course=CMPS%20101
-  //   POST /api/study-groups { course, title }
-  //   POST /api/study-groups/:id/join { name }
 
   const StudyGroups = {
     list: ({ course = '' } = {}) => {
@@ -60,18 +43,11 @@
       const suffix = qs.toString() ? `?${qs.toString()}` : '';
       return request(`/study-groups${suffix}`);
     },
-
-    create: (payload) => {
-      const formatted = {
-        course: payload.course,
-        title: payload.title
-      };
-      return request('/study-groups', {
+    create: (payload) =>
+      request('/study-groups', {
         method: 'POST',
-        body: JSON.stringify(formatted)
-      });
-    },
-
+        body: JSON.stringify({ course: payload.course, title: payload.title })
+      }),
     join: (id, name) =>
       request(`/study-groups/${encodeURIComponent(id)}/join`, {
         method: 'POST',
@@ -79,18 +55,25 @@
       })
   };
 
-  // Placeholders for other use cases
-  // const QA = { ... }
-  // const Resources = { ... }
-  // const Planner = { ... }
+  const Resources = {
+    list: ({ course = '', search = '' } = {}) => {
+      const qs = new URLSearchParams();
+      if (course) qs.set('course', course);
+      if (search) qs.set('search', search);
+      const suffix = qs.toString() ? `?${qs.toString()}` : '';
+      return request(`/resources${suffix}`);
+    },
+    create: (payload) =>
+      request('/resources', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+  };
 
   window.API = {
-    setApiBaseUrl,
     getApiBaseUrl,
     Home,
-    StudyGroups
-    // QA,
-    // Resources,
-    // Planner
+    StudyGroups,
+    Resources
   };
 })();

@@ -38,20 +38,16 @@
         <p class="muted">
           Use the quick links below or the navigation bar to jump into a feature.
         </p>
-        <div class="links">
-          <a class="btn" href="study-groups.html">Find a Study Group</a>
-          <a class="btn" href="qa.html">Ask a Question</a>
-        </div>
       </div>
 
       <!-- Announcements (from /api/home) -->
-      <section class="card">
+      <div class="card">
         <h2>Announcements</h2>
         <ul id="announcements" class="list"></ul>
         <p id="announcements-empty" class="muted" style="display:none;">
           No announcements.
         </p>
-      </section>
+      </div>
     </section>
 
     <!-- Highlights + Quick Links row -->
@@ -83,7 +79,7 @@
   <script>
     async function loadHome() {
       try {
-        // ✅ uses API.Home.get() which calls /api/home
+        // uses API.Home.get() which calls /api/home
         const data = await API.Home.get();
 
         // Welcome message (optional override from homeapi.js)

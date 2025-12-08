@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Academic Support Hub — Study Groups</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <header class="topbar">
+    <h1>Study Groups</h1>
+    <nav class="main-nav">
+      <a href="home.html">Home</a>
+      <a href="study-groups.html">Study Groups</a>
+      <a href="resources.html">Resources</a>
+      <a href="qa.html">Q&amp;A</a>
+      <a href="planner.html" class="active">Planner</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <h2 style="margin:16px 0 12px;">Planner</h2>
+
+<div class="card">
+    <h2>Add Assignment</h2>
+    <form id="NewAssignment">
+        <div class="grid">
+            <label>Email<input name="email" required placeholder="Enter your email address"/></label>
+            <label>Title<input name="title" required/></label>
+            <label>Notes<input name="notes" required/></label>
+            <label>Due Date<input name="due" requiredplaceholder="2026-01-01"/></label>
+            <label>Priority<input name="priority" required placeholder="Enter 1-4"/></label>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:right;">
+            <button id="add-assignment" type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+<br><br>
+
+<div class="card">
+    <h2>List Assignments</h2>
+    <form id="GetAssignment">
+        <div class="grid">
+            <label>Email<input name="email" required placeholder="Enter your email address"/></label>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:right;">
+            <button id="add-assignment" type="submit">Submit</button>
+        </div>
+            <ul id="PlannerList" class="list mt-3"></ul>
+    </form>
+</div>
+
+</main>
+  <script src="api.js"></script>
+  <script src="planner.js"></script>
+</body>
+</html>

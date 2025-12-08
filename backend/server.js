@@ -316,6 +316,8 @@ app.post('/api/resources', async (req, res) => {
   }
 });
 
+
+
 //
 // ===== UC-2: Q&A (Ethan) — JSON-backed prototype =====
 //
@@ -395,6 +397,106 @@ app.post('/api/questions', (req, res) => {
 
   res.status(201).json({ success: true, id: newId });
 });
+
+
+//
+// ===== UC-4: Planner (Brandon) =====
+//
+
+// GET /api/planner
+app.get('/api/assignments', async (req, res) => {
+  
+  const { email } = req.query;
+
+
+
+  try {
+
+    const [userRows] = await pool.query(
+      'SELECT UserID FROM User WHERE Email = ? LIMIT 1',
+      [email]
+    );
+
+    const sql = `
+      SELECT
+        AssignmentID AS id,
+        Title,
+        Notes,
+        DueDate AS 'Due',
+        Priority
+      FROM Assignment
+      WHERE UserID = ?  
+      ORDER BY DueDate ASC, Priority ASC
+    `;
+    
+    const [rows] = await pool.query(sql, [userId]);
+
+    
+    const assignments = rows.map(a => ({
+      ...a,
+      Due: a.Due instanceof Date ? a.Due.toISOString().split('T')[0] : (a.Due || null),
+    }));
+
+    res.json(assignments);
+  } catch (err) {
+    console.error('❌ Error fetching user assignments:', err);
+    res.status(500).json({ error: 'Failed to fetch assignments.', message: err.message });
+  }
+});
+
+// POST /api/assignments  { email, title, notes, due, priority }
+app.post('/api/assignments', async (req, res) => {
+  
+  const { email, title, notes, due, priority } = req.body || {};
+
+    try {
+  
+    const [userRows] = await pool.query(
+      'SELECT UserID FROM User WHERE Email = ? LIMIT 1',
+      [email]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    const userId = userRows[0].UserID;
+
+      const [result] = await pool.query(
+      `INSERT INTO Assignment (UserID, Title, Notes, DueDate, Priority)
+       VALUES (?, ?, ?, ?, ?)`,
+      [
+        userId,        // Insert the looked-up UserID
+        title,
+        notes,
+        due || null,   // Use null if 'due' is empty
+        priority || null // Use null if 'priority' is empty
+      ]
+    );
+
+    // 4. Select and format the new assignment for the response
+    const [rows] = await pool.query(
+      `SELECT
+         AssignmentID AS id, Title, Notes, DueDate AS 'Due', Priority
+       FROM Assignment
+       WHERE AssignmentID = ?`,
+      [result.insertId]
+    );
+
+    // Format the date for the response
+    const newAssignment = {
+      ...rows[0],
+      // Correcting date formatting for the response
+      Due: rows[0].Due instanceof Date ? rows[0].Due.toISOString().split('T')[0] : (rows[0].Due || null),
+    };
+
+    res.status(201).json(newAssignment);
+  } catch (err) {
+    console.error('❌ Error creating assignment:', err);
+    res.status(500).json({ error: 'Failed to create assignment.', message: err.message });
+  }
+});
+
 
 // ----- Error handling -----
 app.use((_req, res) => res.status(404).json({ error: 'Not Found' }));

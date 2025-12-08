@@ -70,10 +70,27 @@
       })
   };
 
+const Planner = {
+
+list: (userEmail) => {
+        if (!userEmail) throw new Error("User email is required to load assignments.");
+        const qs = new URLSearchParams({ email: userEmail });
+        const suffix = `?${qs.toString()}`;
+        return request(`/assignments${suffix}`); 
+    },
+  
+    create: (payload) =>
+        request('/planner', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+};
+
   window.API = {
     getApiBaseUrl,
     Home,
     StudyGroups,
-    Resources
+    Resources,
+    Planner
   };
 })();

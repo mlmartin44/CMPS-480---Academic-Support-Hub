@@ -1,152 +1,211 @@
-/* Reset + base styles */
+/* =====================================================
+   RESET + BASE STYLES
+   ===================================================== */
 :root {
-    --bg: #f7f8fa;
-    --text: #222;
-    --primary: #2a6ef0;
-    --card-bg: #fff;
-    --border: #e1e4e8;
-    --radius: 12px;
-    --shadow: 0 2px 6px rgba(0,0,0,0.08);
-    --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  }
-  
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-  }
-  
-  /* Top bar */
-  .topbar {
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  
-  .topbar h1 {
-    font-size: 20px;
-    font-weight: 600;
-  }
-  
-  .topbar nav a {
-    margin-right: 14px;
-    text-decoration: none;
-    color: var(--text);
-    font-size: 15px;
-  }
-  
-  .topbar nav a:hover {
-    color: var(--primary);
-  }
-  
-  /* Containers */
-  .container {
-    max-width: 1100px;
-    margin: 32px auto;
-    padding: 0 20px;
-  }
-  
-  /* Grid + Cards */
-  .grid {
-    display: grid;
-    gap: 20px;
-  }
-  
-  .cols-2 {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  }
-  
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .card h2 {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-  
-  .card p {
-    flex: 1;
-    margin-bottom: 16px;
-    color: #555;
-  }
-  
-  /* Buttons */
-  button {
-    padding: 10px 16px;
-    border-radius: var(--radius);
-    border: none;
-    background: var(--primary);
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  button:hover {
-    background: #1f54b5;
-  }
+  --bg: #f7f8fa;
+  --text: #222;
+  --primary: #2a6ef0;
+  --card-bg: #fff;
+  --border: #e1e4e8;
+  --radius: 12px;
+  --shadow: 0 2px 6px rgba(0,0,0,0.08);
+  --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
 
 /* =====================================================
-   APPENDED: minimal helpers + link-button styling
+   TOPBAR
    ===================================================== */
+.topbar {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-/* Link styled like a button (used on home cards) */
+.topbar h1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.topbar nav a {
+  margin-right: 14px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.topbar nav a:hover {
+  color: var(--primary);
+}
+
+/* =====================================================
+   CONTAINERS
+   ===================================================== */
+.container {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 20px;
+}
+
+/* =====================================================
+   GRID + CARDS
+   ===================================================== */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.cols-2 {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.card p {
+  flex: 1;
+  margin-bottom: 16px;
+  color: #555;
+}
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
+button,
 .btn {
-  display: inline-block;
   padding: 10px 16px;
   border-radius: var(--radius);
+  border: none;
   background: var(--primary);
   color: #fff;
   font-size: 14px;
-  text-decoration: none;
+  cursor: pointer;
   transition: background 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
 }
-.btn:hover { background: #1f54b5; }
 
-/* Extra helpers for Study Groups page */
-form { display: grid; gap: 16px; margin-top: 12px; }
-label { display: flex; flex-direction: column; font-size: 14px; font-weight: 500; }
-input, select, textarea {
-  margin-top: 6px; padding: 10px 12px; border-radius: var(--radius);
-  border: 1px solid var(--border); font-size: 14px; background: #fff;
+button:hover,
+.btn:hover {
+  background: #1f54b5;
 }
-input:focus, select:focus, textarea:focus {
-  outline: none; border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(42,110,240,0.15);
+
+/* =====================================================
+   FORMS
+   ===================================================== */
+form {
+  display: grid;
+  gap: 16px;
+  margin-top: 12px;
 }
-.list { list-style: none; margin-top: 16px; padding: 0; display: grid; gap: 12px; }
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+input,
+select,
+textarea {
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  background: #fff;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(42, 110, 240, 0.15);
+}
+
+/* =====================================================
+   LISTS
+   ===================================================== */
+.list {
+  list-style: none;
+  margin-top: 16px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
 .list li {
-  background: var(--card-bg); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 18px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 18px;
 }
-.list li strong { display: block; font-size: 16px; margin-bottom: 4px; color: var(--primary); }
-.status { font-size: 14px; margin-left: 12px; color: #555; }
-.status.success { color: #27ae60; }
-.status.error { color: #c0392b; }
-.mt-3 { margin-top: 16px; }
 
-/* TODO markers for teammates (non-functional notes) */
+.list li strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: var(--primary);
+}
+
+/* =====================================================
+   STATUS TEXT
+   ===================================================== */
+.status {
+  font-size: 14px;
+  margin-left: 12px;
+  color: #555;
+}
+
+.status.success {
+  color: #27ae60;
+}
+
+.status.error {
+  color: #c0392b;
+}
+
+.mt-3 {
+  margin-top: 16px;
+}
+
+/* =====================================================
+   TODO PLACEHOLDERS
+   ===================================================== */
 /* TODO: Add custom styles for Q&A page */
 /* TODO: Add custom styles for Resources page */
 /* TODO: Add custom styles for Planner page */

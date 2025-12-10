@@ -1,5 +1,4 @@
-<!doctype html>
-<html lang="en">
+	</ding="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,10 +27,6 @@
           <input id="apiBaseUrl" type="url" placeholder="use http://localhost:5000" />
         </label>
       </div>
-      <div class="mt-3">
-        <button id="saveBaseUrl">Save</button>
-        <span id="apiStatus" class="status"></span>
-      </div>
     </section>
 
     <!-- View Resources -->
@@ -55,20 +50,106 @@
     <!-- Upload Resource -->
     <section class="card">
       <h2>Upload New Resource</h2>
-      <form id="uploadForm">
+      <form id="uploadForm" enctype="multipart/form-data">
         <div class="grid">
           <label>Title <input name="title" required /></label>
           <label>Course <input name="course" required placeholder="e.g., CMPS162" /></label>
-          <label>Tags (comma-separated)
-            <input name="tags" placeholder="logic, proofs" />
-          </label>
+          <label>Tags (comma-separated) <input name="tags" placeholder="logic, proofs" /></label>
           <label>Your Name <input name="uploadedBy" required placeholder="student name" /></label>
+          <label>File <input type="file" name="file" required /></label>
         </div>
         <div class="mt-3">
           <button type="submit">Upload</button>
           <span id="uploadStatus" class="status"></span>
         </div>
       </form>
+    </section>
+
+  </main>
+
+  <script>
+    // --- Upload JS ---
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const apiBaseUrlInput = document.getElementById('apiBaseUrl');
+    const resourceList = document.getElementById('resourceList');
+    const btnLoadResources = document.getElementById('btnLoadResources');
+    const filterCourse = document.getElementById('filterCourse');
+    const filterTag = document.getElementById('filterTag');
+
+    const courseMapping = {
+      'CMPS162': 1,
+      'CMPS262': 2
+      // Add more courses with their IDs as needed
+    };
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(uploadForm);
+      const courseName = formData.get('course');
+      formData.set('courseID', courseMapping[courseName] || 1); // fallback ID 1
+      formData.delete('course');
+
+      const baseUrl = apiBaseUrlInput.value || 'http://localhost:5000';
+
+      try {
+        const res = await fetch(`${baseUrl}/api/material/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        uploadStatus.textContent = `✅ Uploaded "${data.Title}" successfully!`;
+        uploadForm.reset();
+        loadResources(); // refresh list
+      } catch (err) {
+        console.error(err);
+        uploadStatus.textContent = `❌ ${err.message}`;
+      }
+    });
+
+    // --- Load resources ---
+    async function loadResources() {
+      resourceList.innerHTML = '';
+      const baseUrl = apiBaseUrlInput.value || 'http://localhost:5000';
+      const course = filterCourse.value.trim();
+      const tag = filterTag.value.trim();
+
+      let url = `${baseUrl}/api/material?`;
+      if (course) url += `course=${encodeURIComponent(course)}&`;
+      if (tag) url += `tag=${encodeURIComponent(tag)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load resources');
+
+        if (data.length === 0) {
+          resourceList.innerHTML = '<li>No resources found.</li>';
+          return;
+        }
+
+        data.forEach(mat => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${mat.Title}</strong> (${mat.Tags}) — <a href="${mat.FilePath}" target="_blank">Download</a>`;
+          resourceList.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        resourceList.innerHTML = `<li>❌ ${err.message}</li>`;
+      }
+    }
+
+    btnLoadResources.addEventListener('click', loadResources);
+
+    // Load initial resources on page load
+    window.addEventListener('DOMContentLoaded', loadResources);
+  </script>
+</body>
+</html>
+v>
+	      </form>
     </section>
 
   </main>

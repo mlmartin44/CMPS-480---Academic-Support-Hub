@@ -71,16 +71,17 @@
   };
 
 const Planner = {
-
-list: (userEmail) => {
-        if (!userEmail) throw new Error("User email is required to load assignments.");
+    
+    list: (userEmail) => { 
+        
         const qs = new URLSearchParams({ email: userEmail });
         const suffix = `?${qs.toString()}`;
+        
         return request(`/assignments${suffix}`); 
     },
   
     create: (payload) =>
-        request('/planner', {
+        request('/assignments', { 
             method: 'POST',
             body: JSON.stringify(payload)
         })

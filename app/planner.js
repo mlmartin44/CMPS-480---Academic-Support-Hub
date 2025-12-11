@@ -8,7 +8,7 @@
   const addAssignmentButton   = newAssignmentForm?.querySelector('button[type="submit"]'); 
   const loadAssignmentButton  = getAssignmentForm?.querySelector('button[type="submit"]');
 
-  let allAssignments = []; 
+  let allAssignments = [];
 
   const esc = (s = '') =>
     s.toString().replace(/[&<>"]/g, c => ({
@@ -74,7 +74,7 @@
   }
  
   
-  async function loadAssignments(userEmail) {
+async function loadAssignments(userEmail) {
     if (!userEmail) {
         assignmentListContainer.innerHTML = '<li class="list-item"><p style="margin: 0; padding: 12px; color: red;">Error: User email is required to view assignments.</p></li>';
         return;
@@ -85,7 +85,7 @@
     
     try {
   
-      const assignments = await API.Assignments.list({ email: userEmail }); 
+      const assignments = await API.Planner.list(userEmail); 
       allAssignments = Array.isArray(assignments) ? assignments : [];
       renderAssignments(allAssignments);
       
@@ -134,7 +134,7 @@
 
     try {
     
-      await API.Assignments.create(payload);
+      await API.Planner.create(payload);
       newAssignmentForm.reset();
 
     

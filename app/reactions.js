@@ -1,4 +1,4 @@
-// app/reactions.js
+
 window.Reactions = (() => {
   const currentUserId = 1;
 
@@ -10,7 +10,7 @@ window.Reactions = (() => {
     { key: "wow",         char: "😮" }
   ];
 
-  // id -> { reactions: Map<emojiKey, Set<userId>>, children: [] }
+  
   const store = new Map();
 
   function ensureState(id) {
@@ -48,19 +48,19 @@ window.Reactions = (() => {
     const card = document.createElement("div");
     card.className = "card reaction-card";
 
-    // Meta line
+    
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.textContent = `${node.type === "question" ? "Question" : "Comment"} by ${
       node.author
     } • ${node.createdAt}`;
 
-    // Main content
+    
     const content = document.createElement("div");
     content.className = "content";
     content.textContent = node.text;
 
-    // Bar with emoji pills + reply button
+    
     const bar = document.createElement("div");
     bar.className = "bar";
 
@@ -98,7 +98,7 @@ window.Reactions = (() => {
     }
     renderPills();
 
-    // Reply UI
+    
     const replyBtn = document.createElement("button");
     replyBtn.className = "btn small";
     replyBtn.type = "button";
@@ -148,7 +148,7 @@ window.Reactions = (() => {
     box.appendChild(ta);
     box.appendChild(row);
 
-    // Children (replies)
+    
     const kids = document.createElement("div");
 
     function renderChildren() {
@@ -163,7 +163,7 @@ window.Reactions = (() => {
 
         const contentChild = document.createElement("div");
         contentChild.className = "content";
-        // Use textContent to avoid injecting HTML from user input
+        
         contentChild.textContent = c.text;
 
         div.appendChild(metaChild);

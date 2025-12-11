@@ -85,7 +85,7 @@
     
     try {
   
-      const assignments = await API.Assignments.list({ email: userEmail }); 
+      const assignments = await API.Planner.list({ email: userEmail }); 
       allAssignments = Array.isArray(assignments) ? assignments : [];
       renderAssignments(allAssignments);
       
@@ -134,7 +134,7 @@
 
     try {
     
-      await API.Assignments.create(payload);
+      await API.Planner.create(payload);
       newAssignmentForm.reset();
 
     

@@ -92,9 +92,10 @@ app.post('/api/study-groups', async (req, res) => {
   try {
     // Allow formats like "CMPS 480 - Senior Project"
     const rawCourse = (course || '').trim();
-    const baseCode = rawCourse.split('-')[0].trim(); // "CMPS 480"
+    const baseCode = rawCourse.split('-')[0].trim(); // e.g. "CMPS 480"
 
-    const [cRows] = await pool.query(
+    // 1) Try to find an existing course
+    let [cRows] = await pool.query(
       `
        SELECT CourseID, CourseName
        FROM Course
@@ -105,16 +106,20 @@ app.post('/api/study-groups', async (req, res) => {
       [rawCourse, `${baseCode}%`]
     );
 
+    let courseId;
+
+    // 2) If not found, auto-create a new course row
     if (!cRows.length) {
-      return res.status(400).json({
-        error:
-          'Course not found. Please use an existing course code (e.g., "CMPS 480").'
-      });
+      const [insertCourse] = await pool.query(
+        'INSERT INTO Course (CourseName) VALUES (?)',
+        [rawCourse]
+      );
+      courseId = insertCourse.insertId;
+    } else {
+      courseId = cRows[0].CourseID;
     }
 
-    const courseId = cRows[0].CourseID;
-
-    // IMPORTANT: we store your preferred display string in StudyGroup.CourseName
+    // IMPORTANT: store your preferred display name in StudyGroup.CourseName
     const [insert] = await pool.query(
       'INSERT INTO StudyGroup (GroupName, CourseID, CourseName) VALUES (?, ?, ?)',
       [title, courseId, rawCourse]
@@ -240,7 +245,8 @@ app.post('/api/resources', async (req, res) => {
     const rawCourse = (course || '').trim();
     const baseCode = rawCourse.split('-')[0].trim();
 
-    const [cRows] = await pool.query(
+    // 1) Try to find an existing course
+    let [cRows] = await pool.query(
       `
        SELECT CourseID, CourseName
        FROM Course
@@ -251,16 +257,20 @@ app.post('/api/resources', async (req, res) => {
       [rawCourse, `${baseCode}%`]
     );
 
+    let courseId;
+
+    // 2) If not found, auto-create a new course row
     if (!cRows.length) {
-      return res.status(400).json({
-        error:
-          'Course not found. Please use an existing course code (e.g., "CMPS 480").'
-      });
+      const [insertCourse] = await pool.query(
+        'INSERT INTO Course (CourseName) VALUES (?)',
+        [rawCourse]
+      );
+      courseId = insertCourse.insertId;
+    } else {
+      courseId = cRows[0].CourseID;
     }
 
-    const courseId = cRows[0].CourseID;
-
-    // Find or create uploader user
+    // 3) Find or create uploader user
     const first = uploaderName.split(' ')[0];
 
     let [uRows] = await pool.query(
@@ -280,6 +290,7 @@ app.post('/api/resources', async (req, res) => {
       uploaderId = uRows[0].UserID;
     }
 
+    // 4) Insert StudyMaterial with the valid CourseID
     const [insert] = await pool.query(
       `INSERT INTO StudyMaterial (Title, Tags, FilePath, UploadedBy, ApprovedBy, CourseID)
        VALUES (?, ?, ?, ?, NULL, ?)`,

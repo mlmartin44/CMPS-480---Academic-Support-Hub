@@ -18,12 +18,12 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// -------------------- BASIC / HEALTH --------------------
 
 app.get('/', (_req, res) =>
   res.json({ status: 'ok', service: 'ASH API (MySQL)' })
@@ -31,18 +31,22 @@ app.get('/', (_req, res) =>
 
 app.get('/health', async (_req, res) => {
   try {
-    const [rows] = await pool.query("SELECT NOW() AS now");
-    res.json({ status: "ok", db: true, ts: rows[0].now });
+    const [rows] = await pool.query('SELECT NOW() AS now');
+    res.json({ status: 'ok', db: true, ts: rows[0].now });
   } catch (err) {
-    res.status(500).json({ status: "error", db: false, message: err.message });
+    res
+      .status(500)
+      .json({ status: 'error', db: false, message: err.message });
   }
 });
 
+// -------------------- HOME --------------------
 
 app.get('/api/home', (_req, res) => {
   res.json(homeData);
 });
 
+// -------------------- STUDY GROUPS --------------------
 
 app.get('/api/study-groups', async (req, res) => {
   const { course } = req.query;
@@ -61,16 +65,18 @@ app.get('/api/study-groups', async (req, res) => {
 
     const params = [];
     if (course) {
-      sql += " AND sg.CourseName LIKE ?";
+      sql += ' AND sg.CourseName LIKE ?';
       params.push(`%${course}%`);
     }
 
-    sql += " GROUP BY sg.GroupID ORDER BY sg.CourseName, sg.GroupName";
+    sql += ' GROUP BY sg.GroupID ORDER BY sg.CourseName, sg.GroupName';
 
     const [rows] = await pool.query(sql, params);
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch study groups", message: err.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to fetch study groups', message: err.message });
   }
 });
 
@@ -78,30 +84,42 @@ app.post('/api/study-groups', async (req, res) => {
   const { course, title } = req.body;
 
   if (!course || !title) {
-    return res.status(400).json({ error: "Course and title are required." });
+    return res
+      .status(400)
+      .json({ error: 'Course and title are required.' });
   }
 
   try {
     const [cRows] = await pool.query(
-      "SELECT CourseID FROM Course WHERE CourseName = ? LIMIT 1",
+      'SELECT CourseID FROM Course WHERE CourseName = ? LIMIT 1',
       [course]
     );
 
-    const courseId = cRows.length ? cRows[0].CourseID : null;
+    if (!cRows.length) {
+      // IMPORTANT: do not allow NULL CourseID inserts
+      return res.status(400).json({
+        error:
+          'Course not found. Please use an existing course name from the database.'
+      });
+    }
+
+    const courseId = cRows[0].CourseID;
 
     const [insert] = await pool.query(
-      "INSERT INTO StudyGroup (GroupName, CourseID, CourseName) VALUES (?, ?, ?)",
+      'INSERT INTO StudyGroup (GroupName, CourseID, CourseName) VALUES (?, ?, ?)',
       [title, courseId, course]
     );
 
     const [rows] = await pool.query(
-      "SELECT GroupID, GroupName, CourseName FROM StudyGroup WHERE GroupID = ?",
+      'SELECT GroupID, GroupName, CourseName FROM StudyGroup WHERE GroupID = ?',
       [insert.insertId]
     );
 
     res.status(201).json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: "Failed to create group", message: err.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to create group', message: err.message });
   }
 });
 
@@ -109,19 +127,20 @@ app.post('/api/study-groups/:id/join', async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
 
-  if (!name) return res.status(400).json({ error: "Name required." });
+  if (!name) return res.status(400).json({ error: 'Name required.' });
 
   try {
     const [gRows] = await pool.query(
-      "SELECT GroupID FROM StudyGroup WHERE GroupID = ?",
+      'SELECT GroupID FROM StudyGroup WHERE GroupID = ?',
       [id]
     );
-    if (!gRows.length) return res.status(404).json({ error: "Group not found" });
+    if (!gRows.length)
+      return res.status(404).json({ error: 'Group not found' });
 
-    const first = name.split(" ")[0];
+    const first = name.split(' ')[0];
 
     let [uRows] = await pool.query(
-      "SELECT UserID FROM User WHERE FirstName = ? LIMIT 1",
+      'SELECT UserID FROM User WHERE FirstName = ? LIMIT 1',
       [first]
     );
 
@@ -129,8 +148,8 @@ app.post('/api/study-groups/:id/join', async (req, res) => {
     if (!uRows.length) {
       const email = `${first.toLowerCase()}@pointpark.edu`;
       const [newUser] = await pool.query(
-        "INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)",
-        [first, "", email, "Student"]
+        'INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)',
+        [first, '', email, 'Student']
       );
       userId = newUser.insertId;
     } else {
@@ -138,22 +157,24 @@ app.post('/api/study-groups/:id/join', async (req, res) => {
     }
 
     const [check] = await pool.query(
-      "SELECT * FROM UserGroup WHERE UserID = ? AND GroupID = ?",
+      'SELECT * FROM UserGroup WHERE UserID = ? AND GroupID = ?',
       [userId, id]
     );
-    if (check.length) return res.status(400).json({ error: "Already joined" });
+    if (check.length)
+      return res.status(400).json({ error: 'Already joined' });
 
     await pool.query(
-      "INSERT INTO UserGroup (UserID, GroupID) VALUES (?, ?)",
+      'INSERT INTO UserGroup (UserID, GroupID) VALUES (?, ?)',
       [userId, id]
     );
 
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: "Join failed", message: err.message });
+    res.status(500).json({ error: 'Join failed', message: err.message });
   }
 });
 
+// -------------------- RESOURCES --------------------
 
 app.get('/api/resources', async (req, res) => {
   const { course, search } = req.query;
@@ -176,22 +197,24 @@ app.get('/api/resources', async (req, res) => {
     const params = [];
 
     if (course) {
-      sql += " AND c.CourseName = ?";
+      sql += ' AND c.CourseName = ?';
       params.push(course);
     }
 
     if (search) {
-      sql += " AND (sm.Title LIKE ? OR sm.Tags LIKE ?)";
+      sql += ' AND (sm.Title LIKE ? OR sm.Tags LIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
     }
 
-    sql += " ORDER BY c.CourseName, sm.Title";
+    sql += ' ORDER BY c.CourseName, sm.Title';
 
     const [rows] = await pool.query(sql, params);
 
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: "Failed to load resources", message: err.message });
+    res
+      .status(500)
+      .json({ error: 'Failed to load resources', message: err.message });
   }
 });
 
@@ -199,21 +222,31 @@ app.post('/api/resources', async (req, res) => {
   const { title, fileUrl, tags, course, uploaderName } = req.body;
 
   if (!title || !fileUrl || !course || !uploaderName) {
-    return res.status(400).json({ error: "Missing fields" });
+    return res.status(400).json({ error: 'Missing fields' });
   }
 
   try {
+    // 1) Look up CourseID from CourseName
     const [cRows] = await pool.query(
-      "SELECT CourseID FROM Course WHERE CourseName = ? LIMIT 1",
+      'SELECT CourseID FROM Course WHERE CourseName = ? LIMIT 1',
       [course]
     );
 
-    const courseId = cRows.length ? cRows[0].CourseID : null;
+    if (!cRows.length) {
+      // THIS is what prevents "CourseID cannot be null"
+      return res.status(400).json({
+        error:
+          'Course not found. Please use an existing course name from the database.'
+      });
+    }
 
-    const first = uploaderName.split(" ")[0];
+    const courseId = cRows[0].CourseID;
+
+    // 2) Find or create uploader user
+    const first = uploaderName.split(' ')[0];
 
     let [uRows] = await pool.query(
-      "SELECT UserID FROM User WHERE FirstName = ? LIMIT 1",
+      'SELECT UserID FROM User WHERE FirstName = ? LIMIT 1',
       [first]
     );
 
@@ -221,14 +254,15 @@ app.post('/api/resources', async (req, res) => {
     if (!uRows.length) {
       const email = `${first.toLowerCase()}@pointpark.edu`;
       const [newUser] = await pool.query(
-        "INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)",
-        [first, "", email, "Student"]
+        'INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)',
+        [first, '', email, 'Student']
       );
       uploaderId = newUser.insertId;
     } else {
       uploaderId = uRows[0].UserID;
     }
 
+    // 3) Insert StudyMaterial with a REAL CourseID
     const [insert] = await pool.query(
       `INSERT INTO StudyMaterial (Title, Tags, FilePath, UploadedBy, ApprovedBy, CourseID)
        VALUES (?, ?, ?, ?, NULL, ?)`,
@@ -236,20 +270,25 @@ app.post('/api/resources', async (req, res) => {
     );
 
     const [rows] = await pool.query(
-      "SELECT MaterialID, Title, Tags, FilePath FROM StudyMaterial WHERE MaterialID = ?",
+      'SELECT MaterialID, Title, Tags, FilePath FROM StudyMaterial WHERE MaterialID = ?',
       [insert.insertId]
     );
 
     res.status(201).json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: "Failed upload", message: err.message });
+    res
+      .status(500)
+      .json({ error: 'Failed upload', message: err.message });
   }
 });
 
+// -------------------- COURSES (for dropdowns etc.) --------------------
 
 app.get('/api/courses', async (_req, res) => {
   try {
-    const [rows] = await pool.query("SELECT DISTINCT CourseName FROM StudyGroup");
+    const [rows] = await pool.query(
+      'SELECT DISTINCT CourseName FROM StudyGroup'
+    );
     const out = rows.map((r, idx) => {
       const match = String(r.CourseName).match(/\d+/);
       return {
@@ -263,6 +302,7 @@ app.get('/api/courses', async (_req, res) => {
   }
 });
 
+// -------------------- Q&A --------------------
 
 app.get('/api/questions', async (req, res) => {
   const { courseId } = req.query;
@@ -283,11 +323,11 @@ app.get('/api/questions', async (req, res) => {
     const params = [];
 
     if (courseId) {
-      sql += " AND q.CourseID = ?";
+      sql += ' AND q.CourseID = ?';
       params.push(Number(courseId));
     }
 
-    sql += " ORDER BY q.QuestionID DESC";
+    sql += ' ORDER BY q.QuestionID DESC';
 
     const [rows] = await pool.query(sql, params);
 
@@ -301,14 +341,16 @@ app.post('/api/questions', async (req, res) => {
   const { courseId, author, content } = req.body;
 
   if (!author || !content) {
-    return res.status(400).json({ message: "Author and content required." });
+    return res
+      .status(400)
+      .json({ message: 'Author and content required.' });
   }
 
   try {
-    const first = author.split(" ")[0];
+    const first = author.split(' ')[0];
 
     let [uRows] = await pool.query(
-      "SELECT UserID FROM User WHERE FirstName = ? LIMIT 1",
+      'SELECT UserID FROM User WHERE FirstName = ? LIMIT 1',
       [first]
     );
 
@@ -316,27 +358,26 @@ app.post('/api/questions', async (req, res) => {
     if (!uRows.length) {
       const email = `${first.toLowerCase()}@pointpark.edu`;
       const [newUser] = await pool.query(
-        "INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)",
-        [first, "", email, "Student"]
+        'INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)',
+        [first, '', email, 'Student']
       );
       userId = newUser.insertId;
     } else {
       userId = uRows[0].UserID;
     }
 
-    
     let courseIdDb = null;
     if (courseId) {
       const cid = Number(courseId);
       const [cRows] = await pool.query(
-        "SELECT CourseID FROM Course WHERE CourseID = ? LIMIT 1",
+        'SELECT CourseID FROM Course WHERE CourseID = ? LIMIT 1',
         [cid]
       );
       if (cRows.length) courseIdDb = cid;
     }
 
     const [insert] = await pool.query(
-      "INSERT INTO Question (Content, PostedBy, CourseID) VALUES (?, ?, ?)",
+      'INSERT INTO Question (Content, PostedBy, CourseID) VALUES (?, ?, ?)',
       [content, userId, courseIdDb]
     );
 
@@ -360,20 +401,21 @@ app.post('/api/questions', async (req, res) => {
   }
 });
 
+// -------------------- ASSIGNMENTS / PLANNER --------------------
 
 app.get('/api/assignments', async (req, res) => {
   const { email } = req.query;
 
-  if (!email) return res.status(400).json({ error: "Email required." });
+  if (!email) return res.status(400).json({ error: 'Email required.' });
 
   try {
     const [uRows] = await pool.query(
-      "SELECT UserID FROM User WHERE Email = ? LIMIT 1",
+      'SELECT UserID FROM User WHERE Email = ? LIMIT 1',
       [email]
     );
 
     if (!uRows.length) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({ error: 'User not found.' });
     }
 
     const userId = uRows[0].UserID;
@@ -392,9 +434,12 @@ app.get('/api/assignments', async (req, res) => {
 
     const [rows] = await pool.query(sql, [userId]);
 
-    const formatted = rows.map(r => ({
+    const formatted = rows.map((r) => ({
       ...r,
-      Due: r.Due instanceof Date ? r.Due.toISOString().split("T")[0] : r.Due
+      Due:
+        r.Due instanceof Date
+          ? r.Due.toISOString().split('T')[0]
+          : r.Due
     }));
 
     res.json(formatted);
@@ -407,34 +452,39 @@ app.post('/api/assignments', async (req, res) => {
   const { email, title, notes, due, priority } = req.body;
 
   if (!email || !title) {
-    return res.status(400).json({ error: "Email and title required." });
+    return res
+      .status(400)
+      .json({ error: 'Email and title required.' });
   }
 
   try {
     const [uRows] = await pool.query(
-      "SELECT UserID FROM User WHERE Email = ? LIMIT 1",
+      'SELECT UserID FROM User WHERE Email = ? LIMIT 1',
       [email]
     );
 
     if (!uRows.length) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({ error: 'User not found.' });
     }
 
     const userId = uRows[0].UserID;
 
     const [insert] = await pool.query(
-      "INSERT INTO Assignment (UserID, Title, Notes, DueDate, Priority) VALUES (?, ?, ?, ?, ?)",
+      'INSERT INTO Assignment (UserID, Title, Notes, DueDate, Priority) VALUES (?, ?, ?, ?, ?)',
       [userId, title, notes || null, due || null, priority || null]
     );
 
     const [rows] = await pool.query(
-      "SELECT AssignmentID AS id, Title, Notes, DueDate AS Due, Priority FROM Assignment WHERE AssignmentID = ?",
+      'SELECT AssignmentID AS id, Title, Notes, DueDate AS Due, Priority FROM Assignment WHERE AssignmentID = ?',
       [insert.insertId]
     );
 
     const result = {
       ...rows[0],
-      Due: rows[0].Due instanceof Date ? rows[0].Due.toISOString().split("T")[0] : rows[0].Due
+      Due:
+        rows[0].Due instanceof Date
+          ? rows[0].Due.toISOString().split('T')[0]
+          : rows[0].Due
     };
 
     res.status(201).json(result);
@@ -443,8 +493,9 @@ app.post('/api/assignments', async (req, res) => {
   }
 });
 
-app.use((_req, res) => res.status(404).json({ error: "Not Found" }));
+// -------------------- 404 + SERVER START --------------------
 
+app.use((_req, res) => res.status(404).json({ error: 'Not Found' }));
 
 app.listen(PORT, () => {
   console.log(`✅ ASH API running on port ${PORT}`);

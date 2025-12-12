@@ -1,16 +1,4 @@
-let BASE_URL = localStorage.getItem("apiBaseUrl") || "http://localhost:5000";
-
-/* ===========================
-   Save Base URL
-=========================== */
-document.getElementById("saveBaseUrl").addEventListener("click", () => {
-  const url = document.getElementById("apiBaseUrl").value.trim();
-  if (url) {
-    BASE_URL = url;
-    localStorage.setItem("apiBaseUrl", url);
-    document.getElementById("apiStatus").textContent = "Saved!";
-  }
-});
+let BASE_URL = " ";
 
 /* ===========================
    Load Resources

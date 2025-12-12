@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Academic Support Hub — Home</title>
 
-  <!-- Global styles -->
+  <!-- styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Top Bar / Global Nav -->
+  <!-- Top Bar / Nav -->
   <header class="topbar">
     <div class="brand">
       <h1 id="welcome">Academic Support Hub (ASH)</h1>
@@ -26,7 +26,7 @@
   </header>
 
   <main class="container">
-    <!-- Hero / Overview row -->
+    
     <section class="grid cols-2 hero">
       <div class="card">
         <h2>Welcome to the Academic Support Hub</h2>
@@ -40,7 +40,7 @@
         </p>
       </div>
 
-      <!-- Announcements (from /api/home) -->
+      
       <div class="card">
         <h2>Announcements</h2>
         <ul id="announcements" class="list"></ul>
@@ -50,7 +50,7 @@
       </div>
     </section>
 
-    <!-- Highlights + Quick Links row -->
+    
     <section class="grid cols-2">
       <div class="card">
         <h2>Highlights</h2>
@@ -73,21 +73,21 @@
     </section>
   </main>
 
-  <!-- Shared API helper -->
+  
   <script src="api.js"></script>
 
   <script>
     async function loadHome() {
       try {
-        // uses API.Home.get() which calls /api/home
+        
         const data = await API.Home.get();
 
-        // Welcome message (optional override from homeapi.js)
+        
         if (data.welcome) {
           document.getElementById("welcome").textContent = data.welcome;
         }
 
-        // Announcements
+        
         const ul = document.getElementById("announcements");
         ul.innerHTML = "";
         (data.announcements || []).forEach(a => {
@@ -98,7 +98,7 @@
         document.getElementById("announcements-empty").style.display =
           (data.announcements && data.announcements.length) ? "none" : "block";
 
-        // Highlights
+        
         const h = data.highlights || {};
         document.getElementById("qCount").textContent = h.questions ?? 0;
         document.getElementById("rCount").textContent = h.resources ?? 0;

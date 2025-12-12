@@ -90,24 +90,34 @@ app.post('/api/study-groups', async (req, res) => {
   }
 
   try {
+    // Allow formats like "CMPS 480 - Senior Project"
+    const rawCourse = (course || '').trim();
+    const baseCode = rawCourse.split('-')[0].trim(); // "CMPS 480"
+
     const [cRows] = await pool.query(
-      'SELECT CourseID FROM Course WHERE CourseName = ? LIMIT 1',
-      [course]
+      `
+       SELECT CourseID, CourseName
+       FROM Course
+       WHERE CourseName = ?
+          OR CourseName LIKE ?
+       LIMIT 1
+      `,
+      [rawCourse, `${baseCode}%`]
     );
 
     if (!cRows.length) {
-      // IMPORTANT: do not allow NULL CourseID inserts
       return res.status(400).json({
         error:
-          'Course not found. Please use an existing course name from the database.'
+          'Course not found. Please use an existing course code (e.g., "CMPS 480").'
       });
     }
 
     const courseId = cRows[0].CourseID;
 
+    // IMPORTANT: we store your preferred display string in StudyGroup.CourseName
     const [insert] = await pool.query(
       'INSERT INTO StudyGroup (GroupName, CourseID, CourseName) VALUES (?, ?, ?)',
-      [title, courseId, course]
+      [title, courseId, rawCourse]
     );
 
     const [rows] = await pool.query(
@@ -226,23 +236,31 @@ app.post('/api/resources', async (req, res) => {
   }
 
   try {
-    // 1) Look up CourseID from CourseName
+    // Allow formats like "CMPS 480 - Senior Project"
+    const rawCourse = (course || '').trim();
+    const baseCode = rawCourse.split('-')[0].trim();
+
     const [cRows] = await pool.query(
-      'SELECT CourseID FROM Course WHERE CourseName = ? LIMIT 1',
-      [course]
+      `
+       SELECT CourseID, CourseName
+       FROM Course
+       WHERE CourseName = ?
+          OR CourseName LIKE ?
+       LIMIT 1
+      `,
+      [rawCourse, `${baseCode}%`]
     );
 
     if (!cRows.length) {
-      // THIS is what prevents "CourseID cannot be null"
       return res.status(400).json({
         error:
-          'Course not found. Please use an existing course name from the database.'
+          'Course not found. Please use an existing course code (e.g., "CMPS 480").'
       });
     }
 
     const courseId = cRows[0].CourseID;
 
-    // 2) Find or create uploader user
+    // Find or create uploader user
     const first = uploaderName.split(' ')[0];
 
     let [uRows] = await pool.query(
@@ -262,7 +280,6 @@ app.post('/api/resources', async (req, res) => {
       uploaderId = uRows[0].UserID;
     }
 
-    // 3) Insert StudyMaterial with a REAL CourseID
     const [insert] = await pool.query(
       `INSERT INTO StudyMaterial (Title, Tags, FilePath, UploadedBy, ApprovedBy, CourseID)
        VALUES (?, ?, ?, ?, NULL, ?)`,

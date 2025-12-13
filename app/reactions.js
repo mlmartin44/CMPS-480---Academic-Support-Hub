@@ -1,4 +1,3 @@
-
 window.Reactions = (() => {
   const currentUserId = 1;
 

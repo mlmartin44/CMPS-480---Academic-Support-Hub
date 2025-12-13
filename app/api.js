@@ -6,7 +6,7 @@
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1";
 
-  const PROD_CANDIDATES = ["/project/api", "/api"];
+  const PROD_CANDIDATES = ["/api", "/project/api"];
   const LOCAL_BASE = "http://localhost:5000/api";
 
   let _base = isLocal ? LOCAL_BASE : null;

@@ -6,22 +6,13 @@
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1";
 
-  // Candidates in production. We’ll auto-pick whichever responds.
   const PROD_CANDIDATES = ["/project/api", "/api"];
-
-  // Local dev base
   const LOCAL_BASE = "http://localhost:5000/api";
 
-  // Cached chosen base
   let _base = isLocal ? LOCAL_BASE : null;
 
   function getApiBaseUrl() {
-    // If base already determined, use it
-    if (_base) return _base;
-
-    // Fallback if something calls this before detection finishes
-    // (we’ll still do detection automatically below)
-    return "/api";
+    return _base || "/api";
   }
 
   async function detectBase() {
@@ -31,29 +22,29 @@
     }
     if (_base) return _base;
 
-    // Try each candidate with a lightweight ping
+    // Use a REAL endpoint to detect (health can lie depending on nginx)
+    const testPath = "/resources";
+
     for (const candidate of PROD_CANDIDATES) {
       try {
-        const res = await fetch(`${candidate}/health`, { cache: "no-store" });
+        const res = await fetch(`${candidate}${testPath}`, { cache: "no-store" });
         if (res.ok) {
           _base = candidate;
           return _base;
         }
       } catch (_) {
-        // ignore and try next
+        // try next
       }
     }
 
-    // If none worked, default to /api (most common)
     _base = "/api";
     return _base;
   }
 
   async function request(path, opts = {}) {
-    // Ensure base is detected before any request
     await detectBase();
-
     const base = getApiBaseUrl();
+
     const res = await fetch(`${base}${path}`, {
       headers: {
         "Content-Type": "application/json",
@@ -75,12 +66,10 @@
     return ct.includes("application/json") ? res.json() : res.text();
   }
 
-  // ---------------- HOME ----------------
   const Home = {
     get: () => request("/home"),
   };
 
-  // ---------------- STUDY GROUPS ----------------
   const StudyGroups = {
     list: ({ course = "" } = {}) => {
       const qs = new URLSearchParams();
@@ -102,7 +91,6 @@
       }),
   };
 
-  // ---------------- RESOURCES ----------------
   const Resources = {
     list: ({ course = "", search = "" } = {}) => {
       const qs = new URLSearchParams();
@@ -119,7 +107,6 @@
       }),
   };
 
-  // ---------------- PLANNER ----------------
   const Planner = {
     list: (userEmail) => {
       const qs = new URLSearchParams({ email: userEmail });
@@ -133,7 +120,7 @@
       }),
   };
 
-  // Kick off detection ASAP so UI feels fast
+  // Detect early
   detectBase().catch(() => {});
 
   window.API = {

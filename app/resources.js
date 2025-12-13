@@ -1,12 +1,14 @@
 // app/resources.js
 (function () {
-  const btnLoadResources   = document.getElementById("btnLoadResources");
+  // Elements
+  const btnLoadResources = document.getElementById("btnLoadResources");
   const filterCourseSelect = document.getElementById("filterCourseSelect");
-  const searchText         = document.getElementById("searchText");
-  const resourcesList      = document.getElementById("resourcesList");
-  const viewStatus         = document.getElementById("viewStatus");
-  const uploadForm         = document.getElementById("uploadForm");
-  const uploadStatus       = document.getElementById("uploadStatus");
+  const searchText = document.getElementById("searchText");
+  const resourcesList = document.getElementById("resourcesList");
+  const viewStatus = document.getElementById("viewStatus");
+
+  const uploadForm = document.getElementById("uploadForm");
+  const uploadStatus = document.getElementById("uploadStatus");
 
   let allResources = [];
 
@@ -23,7 +25,7 @@
     filterCourseSelect.innerHTML = '<option value="">All courses</option>';
 
     resources.forEach((r) => {
-      const course = r.CourseName || r.course || "";
+      const course = (r.CourseName || "").trim();
       if (course && !seen.has(course)) {
         seen.add(course);
         const opt = document.createElement("option");
@@ -47,8 +49,8 @@
 
     resources.forEach((r) => {
       const title = r.Title ?? "(Untitled resource)";
-      const file  = r.FilePath ?? "";
-      const tags  = r.Tags ?? "";
+      const file = r.FilePath ?? "";
+      const tags = r.Tags ?? "";
       const course = r.CourseName ?? "(No course)";
       const uploader =
         (r.UploadedFirstName || "") +
@@ -95,14 +97,16 @@
     let filtered = allResources.slice();
 
     if (selectedCourse) {
-      filtered = filtered.filter((r) => (r.CourseName || "").toLowerCase() === selectedCourse);
+      filtered = filtered.filter(
+        (r) => (r.CourseName || "").toLowerCase() === selectedCourse
+      );
     }
 
     if (search) {
       filtered = filtered.filter((r) => {
         const title = (r.Title || "").toLowerCase();
-        const tags  = (r.Tags || "").toLowerCase();
-        const course= (r.CourseName || "").toLowerCase();
+        const tags = (r.Tags || "").toLowerCase();
+        const course = (r.CourseName || "").toLowerCase();
         return title.includes(search) || tags.includes(search) || course.includes(search);
       });
     }
@@ -135,15 +139,16 @@
 
   uploadForm?.addEventListener("submit", async (ev) => {
     ev.preventDefault();
+
     uploadStatus.textContent = "Posting...";
     uploadStatus.className = "status";
 
     const form = new FormData(uploadForm);
     const payload = {
-      course:       (form.get("course") || "").trim(),
-      title:        (form.get("title") || "").trim(),
-      fileUrl:      (form.get("fileUrl") || "").trim(),
-      tags:         (form.get("tags") || "").trim(),
+      course: (form.get("course") || "").trim(),
+      title: (form.get("title") || "").trim(),
+      fileUrl: (form.get("fileUrl") || "").trim(),
+      tags: (form.get("tags") || "").trim(),
       uploaderName: (form.get("uploaderName") || "").trim(),
     };
 
@@ -158,7 +163,7 @@
       uploadStatus.textContent = "Resource posted!";
       uploadStatus.className = "status success";
       uploadForm.reset();
-      loadResources();
+      await loadResources();
     } catch (e) {
       console.error(e);
       uploadStatus.textContent = e.message || "Failed to post resource.";

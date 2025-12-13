@@ -201,7 +201,8 @@ app.get('/api/resources', async (req, res) => {
         sm.Title,
         sm.FilePath,
         sm.Tags,
-        c.CourseName,
+        -- Prefer Course.CourseName, but fall back to whatever is stored in StudyMaterial.CourseID
+        COALESCE(c.CourseName, sm.CourseID) AS CourseName,
         u.FirstName AS UploadedFirstName,
         u.LastName AS UploadedLastName
       FROM StudyMaterial sm
@@ -212,8 +213,9 @@ app.get('/api/resources', async (req, res) => {
     const params = [];
 
     if (course) {
-      sql += ' AND c.CourseName = ?';
-      params.push(course);
+      // Match either the pretty course name or the raw CourseID string
+      sql += ' AND (c.CourseName = ? OR sm.CourseID = ?)';
+      params.push(course, course);
     }
 
     if (search) {
@@ -221,94 +223,20 @@ app.get('/api/resources', async (req, res) => {
       params.push(`%${search}%`, `%${search}%`);
     }
 
-    sql += ' ORDER BY c.CourseName, sm.Title';
+    sql += ' ORDER BY CourseName, sm.Title';
 
     const [rows] = await pool.query(sql, params);
 
+    console.log(`Loaded ${rows.length} resources from DB`);
     res.json(rows);
   } catch (err) {
+    console.error('Error in /api/resources:', err);
     res
       .status(500)
       .json({ error: 'Failed to load resources', message: err.message });
   }
 });
 
-app.post('/api/resources', async (req, res) => {
-  const { title, fileUrl, tags, course, uploaderName } = req.body;
-
-  if (!title || !fileUrl || !course || !uploaderName) {
-    return res.status(400).json({ error: 'Missing fields' });
-  }
-
-  try {
-    // Allow formats like "CMPS 480 - Senior Project"
-    const rawCourse = (course || '').trim();
-    const baseCode = rawCourse.split('-')[0].trim();
-
-    // 1) Try to find an existing course
-    let [cRows] = await pool.query(
-      `
-       SELECT CourseID, CourseName
-       FROM Course
-       WHERE CourseName = ?
-          OR CourseName LIKE ?
-       LIMIT 1
-      `,
-      [rawCourse, `${baseCode}%`]
-    );
-
-    let courseId;
-
-    // 2) If not found, auto-create a new course row
-    if (!cRows.length) {
-      const [insertCourse] = await pool.query(
-        'INSERT INTO Course (CourseName) VALUES (?)',
-        [rawCourse]
-      );
-      courseId = insertCourse.insertId;
-    } else {
-      courseId = cRows[0].CourseID;
-    }
-
-    // 3) Find or create uploader user
-    const first = uploaderName.split(' ')[0];
-
-    let [uRows] = await pool.query(
-      'SELECT UserID FROM User WHERE FirstName = ? LIMIT 1',
-      [first]
-    );
-
-    let uploaderId;
-    if (!uRows.length) {
-      const email = `${first.toLowerCase()}@pointpark.edu`;
-      const [newUser] = await pool.query(
-        'INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)',
-        [first, '', email, 'Student']
-      );
-      uploaderId = newUser.insertId;
-    } else {
-      uploaderId = uRows[0].UserID;
-    }
-
-    // 4) Insert StudyMaterial with the valid CourseID
-    const [insert] = await pool.query(
-      `INSERT INTO StudyMaterial (Title, Tags, FilePath, UploadedBy, ApprovedBy, CourseID)
-       VALUES (?, ?, ?, ?, NULL, ?)`,
-      [title, tags || null, fileUrl, uploaderId, courseId]
-    );
-
-    const [rows] = await pool.query(
-      'SELECT MaterialID, Title, Tags, FilePath FROM StudyMaterial WHERE MaterialID = ?',
-      [insert.insertId]
-    );
-
-    res.status(201).json(rows[0]);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Failed upload', message: err.message });
-  }
-});
 
 // -------------------- COURSES (for dropdowns etc.) --------------------
 

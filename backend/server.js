@@ -191,6 +191,12 @@ app.post('/api/study-groups/:id/join', async (req, res) => {
 
 // -------------------- RESOURCES --------------------
 
+/**
+ * GET all resources
+ * Supports optional filters:
+ *  - ?course=Course Name
+ *  - ?search=keyword
+ */
 app.get('/api/resources', async (req, res) => {
   const { course, search } = req.query;
 
@@ -201,7 +207,6 @@ app.get('/api/resources', async (req, res) => {
         sm.Title,
         sm.FilePath,
         sm.Tags,
-        -- Prefer Course.CourseName, but fall back to whatever is stored in StudyMaterial.CourseID
         COALESCE(c.CourseName, sm.CourseID) AS CourseName,
         u.FirstName AS UploadedFirstName,
         u.LastName AS UploadedLastName
@@ -213,7 +218,6 @@ app.get('/api/resources', async (req, res) => {
     const params = [];
 
     if (course) {
-      // Match either the pretty course name or the raw CourseID string
       sql += ' AND (c.CourseName = ? OR sm.CourseID = ?)';
       params.push(course, course);
     }
@@ -226,16 +230,113 @@ app.get('/api/resources', async (req, res) => {
     sql += ' ORDER BY CourseName, sm.Title';
 
     const [rows] = await pool.query(sql, params);
-
-    console.log(`Loaded ${rows.length} resources from DB`);
     res.json(rows);
   } catch (err) {
-    console.error('Error in /api/resources:', err);
-    res
-      .status(500)
-      .json({ error: 'Failed to load resources', message: err.message });
+    console.error('GET /api/resources error:', err);
+    res.status(500).json({
+      error: 'Failed to load resources',
+      message: err.message
+    });
   }
 });
+
+/**
+ * POST a new resource
+ * Auto-creates:
+ *  - Course (if new)
+ *  - User (if new)
+ */
+app.post('/api/resources', async (req, res) => {
+  const { title, fileUrl, tags, course, uploaderName } = req.body;
+
+  if (!title || !fileUrl || !course || !uploaderName) {
+    return res.status(400).json({
+      error: 'Missing required fields',
+      message: 'title, fileUrl, course, and uploaderName are required'
+    });
+  }
+
+  try {
+    // ---------- COURSE ----------
+    const courseName = course.trim();
+
+    let [courseRows] = await pool.query(
+      'SELECT CourseID FROM Course WHERE CourseName = ? LIMIT 1',
+      [courseName]
+    );
+
+    let courseId;
+    if (!courseRows.length) {
+      const [insertCourse] = await pool.query(
+        'INSERT INTO Course (CourseName) VALUES (?)',
+        [courseName]
+      );
+      courseId = insertCourse.insertId;
+    } else {
+      courseId = courseRows[0].CourseID;
+    }
+
+    // ---------- USER ----------
+    const parts = uploaderName.trim().split(' ');
+    const firstName = parts[0];
+    const lastName = parts.slice(1).join(' ') || '';
+
+    let [userRows] = await pool.query(
+      'SELECT UserID FROM User WHERE FirstName = ? AND LastName = ? LIMIT 1',
+      [firstName, lastName]
+    );
+
+    let userId;
+    if (!userRows.length) {
+      const email = `${firstName.toLowerCase()}@pointpark.edu`;
+      const [insertUser] = await pool.query(
+        'INSERT INTO User (FirstName, LastName, Email, Role) VALUES (?, ?, ?, ?)',
+        [firstName, lastName, email, 'Student']
+      );
+      userId = insertUser.insertId;
+    } else {
+      userId = userRows[0].UserID;
+    }
+
+    // ---------- STUDY MATERIAL ----------
+    const [insertMaterial] = await pool.query(
+      `
+      INSERT INTO StudyMaterial
+        (Title, FilePath, Tags, UploadedBy, ApprovedBy, CourseID)
+      VALUES (?, ?, ?, ?, NULL, ?)
+      `,
+      [title, fileUrl, tags || null, userId, courseId]
+    );
+
+    // Return newly created resource
+    const [rows] = await pool.query(
+      `
+      SELECT 
+        sm.MaterialID,
+        sm.Title,
+        sm.FilePath,
+        sm.Tags,
+        c.CourseName AS CourseName,
+        u.FirstName AS UploadedFirstName,
+        u.LastName AS UploadedLastName
+      FROM StudyMaterial sm
+      LEFT JOIN Course c ON sm.CourseID = c.CourseID
+      LEFT JOIN User u ON sm.UploadedBy = u.UserID
+      WHERE sm.MaterialID = ?
+      `,
+      [insertMaterial.insertId]
+    );
+
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    console.error('POST /api/resources error:', err);
+    res.status(500).json({
+      error: 'Failed to create resource',
+      message: err.message
+    });
+  }
+});
+
 
 
 // -------------------- COURSES (for dropdowns etc.) --------------------
